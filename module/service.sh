@@ -82,5 +82,28 @@ if [ -f "$ENABLE_PPM" ]; then
 	echo 1 >"$ENABLE_PPM"
 fi
 
+# Apply thermal optimizations
+if [ -d /data/vendor/thermal ]; then
+	echo '1' > /data/vendor/thermal/thermal-global-mode 2>/dev/null
+	chmod 644 /data/vendor/thermal/thermal-global-mode 2>/dev/null
+fi
+resetprop -n persist.vendor.thermal.enable 0 2>/dev/null
+resetprop -n vendor.thermal.enable 0 2>/dev/null
+for zone in /sys/class/thermal/thermal_zone*/mode; do
+	echo "disabled" > "$zone" 2>/dev/null || true
+done
+
+# SUSFS late cloaking check
+for _sus in /data/adb/ksu/bin/ksu_susfs /system/bin/susfs /data/adb/bin/ksu_susfs /data/adb/ap/bin/ksu_susfs; do
+	if [ -x "$_sus" ]; then
+		"$_sus" add_sus_path_loop "$MODULE_CONFIG" 2>/dev/null || "$_sus" add_sus_path "$MODULE_CONFIG" 2>/dev/null
+		[ -f "$MODDIR/system/bin/encored" ] && "$_sus" add_sus_map "$MODDIR/system/bin/encored" 2>/dev/null
+		break
+	fi
+done
+if command -v ksud >/dev/null 2>&1; then
+	ksud kernel umount add 'encore' 2>/dev/null
+fi
+
 # Start Encore Daemon
 encored daemon

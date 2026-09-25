@@ -149,6 +149,7 @@ ui_print "- Extracting module files"
 extract "$ZIPFILE" 'module.prop' "$MODPATH"
 extract "$ZIPFILE" 'banner.webp' "$MODPATH"
 extract "$ZIPFILE" 'service.sh' "$MODPATH"
+extract "$ZIPFILE" 'post-fs-data.sh' "$MODPATH"
 extract "$ZIPFILE" 'uninstall.sh' "$MODPATH"
 extract "$ZIPFILE" 'action.sh' "$MODPATH"
 extract "$ZIPFILE" 'cleanup.sh' "$MODPATH"
@@ -175,7 +176,9 @@ touch "$MODPATH/skip_mountify"
 if [ "$KSU" = "true" ] || [ "$APATCH" = "true" ]; then
   ui_print "- KSU/AP Detected, skipping module mount (skip_mount)"
 	rm "$MODPATH/action.sh"
-	touch "$MODPATH/skip_mount"
+	if [ ! -d "$MODPATH/odm" ]; then
+		touch "$MODPATH/skip_mount"
+	fi
 
 	# symlink ourselves on $PATH
 	manager_paths="/data/adb/ap/bin /data/adb/ksu/bin"
@@ -194,6 +197,17 @@ fi
 ui_print "- Extracting webroot"
 unzip -o "$ZIPFILE" "webroot/*" -d "$MODPATH" -x "*.sha256" >&2
 
+# Extract thermal configurations if present
+if unzip -l "$ZIPFILE" 2>/dev/null | grep -q "odm/"; then
+	ui_print "- Extracting optimized thermal engine profiles"
+	unzip -o "$ZIPFILE" "odm/*" -d "$MODPATH" -x "*.sha256" >&2
+	set_perm_recursive "$MODPATH/odm" 0 0 0755 0644
+fi
+if unzip -l "$ZIPFILE" 2>/dev/null | grep -q "system/vendor/"; then
+	unzip -o "$ZIPFILE" "system/vendor/*" -d "$MODPATH/system" -x "*.sha256" >&2
+	set_perm_recursive "$MODPATH/system/vendor" 0 0 0755 0644
+fi
+
 # Mitigate root detection
 [ -d /data/encore ] && rm -rf /data/encore
 [ -f /data/local/tmp/encore_logo.png ] && rm -f /data/local/tmp/encore_logo.png
@@ -208,6 +222,7 @@ rm -rf "$MODULE_CONFIG/config"
 # Permission settings
 ui_print "- Permission setup"
 set_perm_recursive "$MODPATH/system/bin" 0 0 0755 0755
+set_perm "$MODPATH/post-fs-data.sh" 0 0 0755 2>/dev/null
 
 # Gamelist setup
 if [ ! -f "$MODULE_CONFIG/gamelist.json" ]; then
