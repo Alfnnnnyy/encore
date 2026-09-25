@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <cstdarg>
 #include <cstdio>
 #include <memory>
 #include <vector>
