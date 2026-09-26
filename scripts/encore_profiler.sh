@@ -25,6 +25,29 @@
 MODULE_CONFIG="/data/adb/.config/zcore"
 [ ! -d "$MODULE_CONFIG" ] && [ -d "/data/adb/.config/encore" ] && MODULE_CONFIG="/data/adb/.config/encore"
 
+# Qualcomm PMIC Glink Bypass Charging nodes
+QCOM_CHARGE_CTRL="/sys/devices/platform/soc/soc:qcom,pmic_glink/soc:qcom,pmic_glink:qcom,battery_charger/power_supply/battery/charge_control_limit"
+QCOM_CHARGE_CURR="/sys/devices/platform/soc/soc:qcom,pmic_glink/soc:qcom,pmic_glink:qcom,battery_charger/power_supply/battery/constant_charge_current"
+QCOM_INPUT_SUSPEND="/sys/class/qcom-battery/input_suspend"
+
+is_bypass_supported() {
+	[ -f "$QCOM_CHARGE_CTRL" ] && [ -f "$QCOM_CHARGE_CURR" ] && [ -f "$QCOM_INPUT_SUSPEND" ]
+}
+
+restore_normal_charging() {
+	if is_bypass_supported; then
+		val=$(cat "$QCOM_CHARGE_CTRL" 2>/dev/null)
+		if [ "$val" = "15" ]; then
+			chmod 666 "$QCOM_CHARGE_CTRL" "$QCOM_CHARGE_CURR" "$QCOM_INPUT_SUSPEND" 2>/dev/null
+			echo 0 > "$QCOM_CHARGE_CTRL" 2>/dev/null
+			echo 20000000 > "$QCOM_CHARGE_CURR" 2>/dev/null
+			echo 1 > "$QCOM_INPUT_SUSPEND" 2>/dev/null && sleep 0.1 && echo 0 > "$QCOM_INPUT_SUSPEND" 2>/dev/null
+			chmod 644 "$QCOM_CHARGE_CTRL" "$QCOM_CHARGE_CURR" 2>/dev/null
+			chmod 666 "$QCOM_INPUT_SUSPEND" 2>/dev/null
+		fi
+	fi
+}
+
 # SoC recognition
 SOC=$(<$MODULE_CONFIG/soc_recognition)
 
@@ -863,9 +886,24 @@ performance_profile() {
 	esac
 
 	echo 3 >/proc/sys/vm/drop_caches
+
+	# Engage bypass charging if requested and supported
+	if [ -f "$MODULE_CONFIG/active_game_bypass" ]; then
+		if is_bypass_supported; then
+			chmod 666 "$QCOM_CHARGE_CTRL" "$QCOM_CHARGE_CURR" "$QCOM_INPUT_SUSPEND" 2>/dev/null
+			echo 15 > "$QCOM_CHARGE_CTRL" 2>/dev/null
+			echo 0 > "$QCOM_CHARGE_CURR" 2>/dev/null
+			echo 1 > "$QCOM_INPUT_SUSPEND" 2>/dev/null && sleep 0.1 && echo 0 > "$QCOM_INPUT_SUSPEND" 2>/dev/null
+			chmod 444 "$QCOM_CHARGE_CTRL" "$QCOM_CHARGE_CURR" 2>/dev/null
+			chmod 666 "$QCOM_INPUT_SUSPEND" 2>/dev/null
+		fi
+	fi
 }
 
 balance_profile() {
+	# Restore normal charging if bypass was active
+	restore_normal_charging
+
 	# Disable battery saver module
 	[ -f /sys/module/battery_saver/parameters/enabled ] && {
 		if grep -qo '[0-9]\+' /sys/module/battery_saver/parameters/enabled; then

@@ -1,3 +1,20 @@
+## Zcore Tweaks 5.4.1
+
+**Thanks for using Zcore Tweaks!**
+
+Your continued support keeps this project going.
+
+### Changelog
+
+- Add Bypass Charging toggle in GameSettings with strict hardware support validation
+- Implement Qualcomm PMIC Glink bypass power routing (charge_control_limit, constant_charge_current, input_suspend)
+- Automatically disable toggle when hardware nodes are missing (safe on unsupported devices)
+- Auto-engage bypass charging during game sessions and auto-restore normal charging on game exit
+- Add CLI controls in encore_utility: is_bypass_supported, get_bypass_status, set_bypass_charging
+- Add localized string translations across all 11 supported languages
+
+---
+
 ## Zcore Tweaks 5.4.0
 
 **Thanks for using Zcore Tweaks!**

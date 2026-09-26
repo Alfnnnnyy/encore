@@ -7,6 +7,22 @@ export const useGamesStore = defineStore('games', () => {
   const searchQuery = ref('')
   const isLoading = ref(false)
   const gamelistConfig = ref({})
+  const isBypassSupported = ref(false)
+
+  async function checkBypassSupport() {
+    try {
+      const qcomNodes = [
+        '/sys/devices/platform/soc/soc:qcom,pmic_glink/soc:qcom,pmic_glink:qcom,battery_charger/power_supply/battery/charge_control_limit',
+        '/sys/devices/platform/soc/soc:qcom,pmic_glink/soc:qcom,pmic_glink:qcom,battery_charger/power_supply/battery/constant_charge_current',
+        '/sys/class/qcom-battery/input_suspend',
+      ]
+      const checks = await Promise.all(qcomNodes.map((p) => KernelSU.fileExists(p)))
+      isBypassSupported.value = checks.every(Boolean)
+    } catch {
+      isBypassSupported.value = false
+    }
+    return isBypassSupported.value
+  }
 
   const isAppEnabled = (packageName) => packageName in gamelistConfig.value
 
@@ -32,12 +48,23 @@ export const useGamesStore = defineStore('games', () => {
     return [...enabled.sort(sortByName), ...disabled.sort(sortByName)]
   })
 
-  const configPath = '/data/adb/.config/encore/gamelist.json'
+  async function getConfigPath() {
+    if (await KernelSU.fileExists('/data/adb/.config/zcore/gamelist.json')) {
+      return '/data/adb/.config/zcore/gamelist.json'
+    }
+    if (await KernelSU.fileExists('/data/adb/.config/encore/gamelist.json')) {
+      return '/data/adb/.config/encore/gamelist.json'
+    }
+    return '/data/adb/.config/zcore/gamelist.json'
+  }
+
+  let activeConfigPath = '/data/adb/.config/zcore/gamelist.json'
 
   async function loadGamelistConfig() {
     try {
-      if (await KernelSU.fileExists(configPath)) {
-        const content = await KernelSU.readFile(configPath)
+      activeConfigPath = await getConfigPath()
+      if (await KernelSU.fileExists(activeConfigPath)) {
+        const content = await KernelSU.readFile(activeConfigPath)
         gamelistConfig.value = JSON.parse(content)
         console.log('Gamelist config loaded successfully')
         return gamelistConfig.value
@@ -55,7 +82,7 @@ export const useGamesStore = defineStore('games', () => {
   async function saveGamelistConfig() {
     try {
       const configString = JSON.stringify(gamelistConfig.value, null, 2)
-      await KernelSU.writeFile(configPath, configString)
+      await KernelSU.writeFile(activeConfigPath, configString)
       console.log('Gamelist config saved successfully')
       return true
     } catch (e) {
@@ -99,6 +126,7 @@ export const useGamesStore = defineStore('games', () => {
       return await updateAppConfig(packageName, {
         lite_mode: currentConfig.lite_mode || false,
         enable_dnd: currentConfig.enable_dnd || false,
+        enable_bypass_charging: currentConfig.enable_bypass_charging || false,
       })
     } else {
       return await updateAppConfig(packageName, null)
@@ -237,5 +265,7 @@ export const useGamesStore = defineStore('games', () => {
     loadUserApps,
     initializeData,
     refreshFromSettings,
+    isBypassSupported,
+    checkBypassSupport,
   }
 })

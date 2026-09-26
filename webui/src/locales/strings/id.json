@@ -81,7 +81,10 @@
         "dnd_mode": "Jangan Ganggu",
         "dnd_mode_description": "Blokir notifikasi dan panggilan saat bermain game",
         "launch_app": "Buka",
-        "app_info": "Info aplikasi"
+        "app_info": "Info aplikasi",
+        "bypass_charging": "Bypass Charging",
+        "bypass_charging_description": "Alirkan daya charger langsung ke mesin saat bermain game untuk menjaga suhu baterai tetap dingin",
+        "bypass_charging_unsupported": "Perangkat keras tidak didukung (memerlukan Qualcomm PMIC Glink)"
     },
     "language_selection": {
         "title": "Bahasa",

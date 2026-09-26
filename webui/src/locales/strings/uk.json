@@ -81,7 +81,10 @@
         "dnd_mode": "Не турбувати",
         "dnd_mode_description": "Блокувати сповіщення та дзвінки під час гри",
         "launch_app": "Запуск",
-        "app_info": "Інформація про застосунок"
+        "app_info": "Інформація про застосунок",
+        "bypass_charging": "Обхідне заряджання (Bypass)",
+        "bypass_charging_description": "Живлення безпосередньо плати під час гри для запобігання нагріванню акумулятора",
+        "bypass_charging_unsupported": "Апаратне забезпечення не підтримується (потрібен Qualcomm PMIC Glink)"
     },
     "language_selection": {
         "title": "Мова",

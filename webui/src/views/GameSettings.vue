@@ -119,6 +119,23 @@
                 <ToggleSwitch class="opacity-100!" :model-value="appSettings.enable_dnd"
                   :disabled="!appSettings.isEnabled" @update:model-value="toggleDndMode" />
               </div>
+
+              <!-- Bypass Charging -->
+              <div class="flex items-center justify-between" :class="{ 'opacity-50': !appSettings.isEnabled || !gamesStore.isBypassSupported }">
+                <div class="flex items-center gap-8">
+                  <BatteryCharging :size="25" class="text-primary shrink-0" />
+                  <div class="pr-4">
+                    <h3 class="text-base font-medium text-on-surface">
+                      {{ $t('game_settings.bypass_charging') }}
+                    </h3>
+                    <p class="text-sm text-on-surface-variant">
+                      {{ gamesStore.isBypassSupported ? $t('game_settings.bypass_charging_description') : $t('game_settings.bypass_charging_unsupported') }}
+                    </p>
+                  </div>
+                </div>
+                <ToggleSwitch class="opacity-100!" :model-value="appSettings.enable_bypass_charging"
+                  :disabled="!appSettings.isEnabled || !gamesStore.isBypassSupported" @update:model-value="toggleBypassCharging" />
+              </div>
             </div>
           </div>
         </div>
@@ -146,13 +163,14 @@ import Feather from '@/components/icons/Feather.vue'
 import NoEntry from '@/components/icons/NoEntry.vue'
 import InformationOutline from '@/components/icons/InformationOutline.vue'
 import OpenInNew from '@/components/icons/OpenInNew.vue'
+import BatteryCharging from '@/components/icons/BatteryCharging.vue'
 
 const route = useRoute()
 const router = useRouter()
 const gamesStore = useGamesStore()
 const encoreConfigStore = useEncoreConfigStore()
 
-const appSettings = shallowRef({ isEnabled: false, lite_mode: false, enable_dnd: false })
+const appSettings = shallowRef({ isEnabled: false, lite_mode: false, enable_dnd: false, enable_bypass_charging: false })
 
 const currentApp = ref({})
 const originalSettings = ref({})
@@ -190,6 +208,7 @@ watch(
 
 onMounted(async () => {
   await loadGlobalConfig()
+  await gamesStore.checkBypassSupport()
   loadAppData()
 })
 
@@ -219,7 +238,7 @@ async function loadAppData(packageName = null) {
   if (!targetPackageName) return router.push('/games')
 
   currentApp.value = {}
-  appSettings.value = { isEnabled: false, lite_mode: false, enable_dnd: false }
+  appSettings.value = { isEnabled: false, lite_mode: false, enable_dnd: false, enable_bypass_charging: false }
 
   // First try to get from store
   const fromStore = gamesStore.userApps.find((a) => a.packageName === targetPackageName)
@@ -263,6 +282,7 @@ function loadAppSettings() {
     isEnabled: currentApp.value.packageName in gamesStore.gamelistConfig,
     lite_mode: !!cfg.lite_mode,
     enable_dnd: !!cfg.enable_dnd,
+    enable_bypass_charging: !!cfg.enable_bypass_charging,
   }
 }
 
@@ -272,6 +292,7 @@ function toggleAppEnabled() {
     isEnabled: newValue,
     lite_mode: newValue ? appSettings.value.lite_mode : false,
     enable_dnd: newValue ? appSettings.value.enable_dnd : false,
+    enable_bypass_charging: newValue ? appSettings.value.enable_bypass_charging : false,
   }
 }
 
@@ -294,6 +315,16 @@ function toggleDndMode() {
       ...appSettings.value,
       enable_dnd: !appSettings.value.enable_dnd,
     }
+  }
+}
+
+function toggleBypassCharging() {
+  if (!gamesStore.isBypassSupported || !appSettings.value.isEnabled) {
+    return
+  }
+  appSettings.value = {
+    ...appSettings.value,
+    enable_bypass_charging: !appSettings.value.enable_bypass_charging,
   }
 }
 
@@ -322,6 +353,7 @@ async function saveSettings() {
       await gamesStore.updateAppConfig(pkg, {
         lite_mode: appSettings.value.lite_mode,
         enable_dnd: appSettings.value.enable_dnd,
+        enable_bypass_charging: appSettings.value.enable_bypass_charging,
       })
     } else {
       await gamesStore.updateAppConfig(pkg, null)

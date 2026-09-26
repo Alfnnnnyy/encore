@@ -79,7 +79,10 @@
         "dnd_mode": "Vui lòng không làm phiền",
         "dnd_mode_description": "Chặn thông báo và cuộc gọi khi chơi game",
         "launch_app": "Khởi chạy",
-        "app_info": "Thông tin ứng dụng"
+        "app_info": "Thông tin ứng dụng",
+        "bypass_charging": "Sạc nhánh (Bypass Charging)",
+        "bypass_charging_description": "Cấp nguồn trực tiếp cho thiết bị khi chơi game để giữ cho pin luôn mát",
+        "bypass_charging_unsupported": "Phần cứng không được hỗ trợ (yêu cầu Qualcomm PMIC Glink)"
     },
     "language_selection": {
         "title": "Ngôn ngữ",

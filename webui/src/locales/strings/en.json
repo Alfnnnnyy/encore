@@ -81,7 +81,10 @@
         "dnd_mode": "Do Not Disturb",
         "dnd_mode_description": "Block notifications and calls while gaming",
         "launch_app": "Launch",
-        "app_info": "App info"
+        "app_info": "App info",
+        "bypass_charging": "Bypass Charging",
+        "bypass_charging_description": "Supply power directly to the device while gaming to keep the battery cool",
+        "bypass_charging_unsupported": "Hardware unsupported (requires Qualcomm PMIC Glink)"
     },
     "language_selection": {
         "title": "Language",

@@ -89,7 +89,10 @@
         "dnd_mode": "No Molestar",
         "dnd_mode_description": "Bloquea notificaciones y llamadas mientras juegas",
         "app_info": "Información de aplicación",
-        "launch_app": "Iniciar"
+        "launch_app": "Iniciar",
+        "bypass_charging": "Carga Bypass",
+        "bypass_charging_description": "Suministra energía directamente al dispositivo al jugar para mantener la batería fría",
+        "bypass_charging_unsupported": "Hardware no compatible (requiere Qualcomm PMIC Glink)"
     },
     "language_selection": {
         "title": "Idioma",
