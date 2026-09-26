@@ -1,3 +1,18 @@
+## Zcore Tweaks 5.4.2
+
+**Thanks for using Zcore Tweaks!**
+
+Your continued support keeps this project going.
+
+### Changelog
+
+- Fix ZeroMount partition mapping by placing odm directly under module root (per ZeroMount VFS specification)
+- Fix native C++ daemon config path fallback to prevent "gamelist.json is missing" crashes
+- Ensure dual-directory synchronization between /data/adb/.config/zcore and /data/adb/.config/encore
+- Fully resolve ZeroMount VFS hot-loading and prevent automatic unloads
+
+---
+
 ## Zcore Tweaks 5.4.1
 
 **Thanks for using Zcore Tweaks!**

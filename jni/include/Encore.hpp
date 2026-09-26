@@ -18,11 +18,14 @@
 
 #include <string>
 
-#define NOTIFY_TITLE "Encore Tweaks"
-#define LOG_TAG "EncoreTweaks"
+#define NOTIFY_TITLE "Zcore Tweaks"
+#define LOG_TAG "ZcoreTweaks"
 
-#define CONFIG_DIR "/data/adb/.config/encore"
-#define MODPATH "/data/adb/modules/encore"
+#define CONFIG_DIR "/data/adb/.config/zcore"
+#define MODPATH "/data/adb/modules/zcore"
+
+#define LEGACY_CONFIG_DIR "/data/adb/.config/encore"
+#define LEGACY_MODPATH "/data/adb/modules/encore"
 
 #define LOCK_FILE CONFIG_DIR "/.lock"
 #define JAVA_LOCK_FILE CONFIG_DIR "/java.lock"

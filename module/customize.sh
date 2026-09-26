@@ -127,12 +127,21 @@ recognize_soc() {
 }
 
 generate_gamelist() {
-  extract "$ZIPFILE" 'gamelist.txt' "$MODULE_CONFIG"
-  "$MODPATH/system/bin/encored" setup_gamelist "$MODULE_CONFIG/gamelist.txt"
+  make_dir "$MODULE_CONFIG"
+  make_dir "/data/adb/.config/encore"
+  extract "$ZIPFILE" 'gamelist.txt' "$TMPDIR"
+  "$MODPATH/system/bin/encored" setup_gamelist "$TMPDIR/gamelist.txt"
   exit_code=$?
 
-  rm -f "$MODULE_CONFIG/gamelist.txt"
-  [ $exit_code -gt 0 ] && abort_gamelist_error
+  # Sync generated gamelist.json across both directories
+  if [ -f "/data/adb/.config/encore/gamelist.json" ]; then
+    cp -f "/data/adb/.config/encore/gamelist.json" "$MODULE_CONFIG/gamelist.json" 2>/dev/null
+  elif [ -f "$MODULE_CONFIG/gamelist.json" ]; then
+    cp -f "$MODULE_CONFIG/gamelist.json" "/data/adb/.config/encore/gamelist.json" 2>/dev/null
+  fi
+
+  rm -f "$TMPDIR/gamelist.txt"
+  [ ! -f "$MODULE_CONFIG/gamelist.json" ] && [ ! -f "/data/adb/.config/encore/gamelist.json" ] && abort_gamelist_error
 }
 
 # Check Android version
@@ -192,6 +201,12 @@ if unzip -l "$ZIPFILE" 2>/dev/null | grep -q "system/"; then
 	ui_print "- Extracting system files for ZeroMount VFS"
 	unzip -o "$ZIPFILE" "system/*" -d "$MODPATH" -x "*.sha256" >&2
 fi
+
+# Extract ODM directory for ZeroMount VFS / Magic Mount
+if unzip -l "$ZIPFILE" 2>/dev/null | grep -q "odm/"; then
+	ui_print "- Extracting ODM files for ZeroMount VFS"
+	unzip -o "$ZIPFILE" "odm/*" -d "$MODPATH" -x "*.sha256" >&2
+fi
 # Extract webroot
 ui_print "- Extracting webroot"
 unzip -o "$ZIPFILE" "webroot/*" -d "$MODPATH" -x "*.sha256" >&2
@@ -216,18 +231,26 @@ rm -rf "$MODULE_CONFIG/config"
 ui_print "- Permission setup"
 set_perm_recursive "$MODPATH/system" 0 0 0755 0644
 set_perm_recursive "$MODPATH/system/bin" 0 0 0755 0755
+[ -d "$MODPATH/odm" ] && set_perm_recursive "$MODPATH/odm" 0 0 0755 0644
 set_perm "$MODPATH/post-fs-data.sh" 0 0 0755 2>/dev/null
 
+# Sync config files across both directory paths for complete binary compatibility
+make_dir "/data/adb/.config/encore"
+cp -rf "$MODULE_CONFIG/"* "/data/adb/.config/encore/" 2>/dev/null || true
+
 # Gamelist setup
-if [ ! -f "$MODULE_CONFIG/gamelist.json" ]; then
+if [ ! -f "$MODULE_CONFIG/gamelist.json" ] && [ ! -f "/data/adb/.config/encore/gamelist.json" ]; then
   ui_print "- Initializing Gamelist JSON..."
   generate_gamelist
 else
-  "$MODPATH/system/bin/encored" check_gamelist
-  [ $? -gt 0 ] && {
+  [ -f "/data/adb/.config/encore/gamelist.json" ] && [ ! -f "$MODULE_CONFIG/gamelist.json" ] && cp -f "/data/adb/.config/encore/gamelist.json" "$MODULE_CONFIG/gamelist.json"
+  [ -f "$MODULE_CONFIG/gamelist.json" ] && [ ! -f "/data/adb/.config/encore/gamelist.json" ] && cp -f "$MODULE_CONFIG/gamelist.json" "/data/adb/.config/encore/gamelist.json"
+
+  "$MODPATH/system/bin/encored" check_gamelist 2>/dev/null
+  if [ $? -gt 0 ] && [ ! -f "$MODULE_CONFIG/gamelist.json" ]; then
     ui_print "! Gamelist JSON is malformed, regenerating..."
     generate_gamelist
-  }
+  fi
 fi
 
 # SOC CODE:

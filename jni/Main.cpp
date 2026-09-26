@@ -46,6 +46,18 @@ namespace fs = std::filesystem;
 // Global registry & state
 // ---------------------------------------------------------------------------
 
+static std::string resolve_config_file(const std::string& filename) {
+    std::string primary = std::string(CONFIG_DIR) + "/" + filename;
+    if (access(primary.c_str(), F_OK) == 0) {
+        return primary;
+    }
+    std::string legacy = std::string(LEGACY_CONFIG_DIR) + "/" + filename;
+    if (access(legacy.c_str(), F_OK) == 0) {
+        return legacy;
+    }
+    return primary;
+}
+
 GameRegistry game_registry;
 
 struct DaemonState {
@@ -291,22 +303,24 @@ int cmd_run_daemon() {
         return EXIT_FAILURE;
     }
 
-    if (access(ENCORE_GAMELIST, F_OK) != 0) {
-        std::cerr << "\033[31mERROR:\033[0m " << ENCORE_GAMELIST << " is missing\n";
+    std::string gamelist_path = resolve_config_file("gamelist.json");
+    if (access(gamelist_path.c_str(), F_OK) != 0) {
+        std::cerr << "\033[31mERROR:\033[0m " << gamelist_path << " is missing\n";
         notify_fatal_error("gamelist.json is missing");
-        LOGC("{} is missing", ENCORE_GAMELIST);
+        LOGC("{} is missing", gamelist_path);
         return EXIT_FAILURE;
     }
 
-    if (!game_registry.load_from_json(ENCORE_GAMELIST)) {
-        std::cerr << "\033[31mERROR:\033[0m Failed to parse " << ENCORE_GAMELIST << '\n';
+    if (!game_registry.load_from_json(gamelist_path)) {
+        std::cerr << "\033[31mERROR:\033[0m Failed to parse " << gamelist_path << '\n';
         notify_fatal_error("Failed to parse gamelist.json");
-        LOGC("Failed to parse {}", ENCORE_GAMELIST);
+        LOGC("Failed to parse {}", gamelist_path);
         return EXIT_FAILURE;
     }
 
-    if (!device_mitigation_store.load_config()) {
-        std::cerr << "\033[31mERROR:\033[0m Failed to parse " << DEVICE_MITIGATION_FILE << '\n';
+    std::string mitigation_path = resolve_config_file("device_mitigation.json");
+    if (!device_mitigation_store.load_config(mitigation_path)) {
+        std::cerr << "\033[31mERROR:\033[0m Failed to parse " << mitigation_path << '\n';
         notify_fatal_error("Failed to parse device_mitigation.json");
         LOGC("Failed to parse {}", DEVICE_MITIGATION_FILE);
         return EXIT_FAILURE;
@@ -365,26 +379,43 @@ int cmd_version() {
 }
 
 int cmd_setup_gamelist(const std::string& base_file_path) {
-    bool success = GameRegistry::populate_from_base(ENCORE_GAMELIST, base_file_path);
+    fs::create_directories(CONFIG_DIR);
+    fs::create_directories(LEGACY_CONFIG_DIR);
+
+    bool success = GameRegistry::populate_from_base(std::string(CONFIG_DIR) + "/gamelist.json", base_file_path);
+    if (!success) {
+        success = GameRegistry::populate_from_base(std::string(LEGACY_CONFIG_DIR) + "/gamelist.json", base_file_path);
+    }
     if (!success) {
         std::cerr << "\033[31mERROR:\033[0m Failed to setup gamelist from " << base_file_path << std::endl;
         return EXIT_FAILURE;
     }
+
+    // Sync to both locations
+    try {
+        std::string primary = std::string(CONFIG_DIR) + "/gamelist.json";
+        std::string legacy = std::string(LEGACY_CONFIG_DIR) + "/gamelist.json";
+        if (fs::exists(primary)) {
+            fs::copy_file(primary, legacy, fs::copy_options::overwrite_existing);
+        }
+    } catch (...) {}
+
     return EXIT_SUCCESS;
 }
 
 int cmd_check_gamelist() {
-    if (access(ENCORE_GAMELIST, F_OK) != 0) {
-        std::cerr << "\033[33mERROR:\033[0m " << ENCORE_GAMELIST << " does not exist" << std::endl;
+    std::string gamelist_path = resolve_config_file("gamelist.json");
+    if (access(gamelist_path.c_str(), F_OK) != 0) {
+        std::cerr << "\033[33mERROR:\033[0m " << gamelist_path << " does not exist" << std::endl;
         return EXIT_FAILURE;
     }
     GameRegistry registry;
-    if (!registry.load_from_json(ENCORE_GAMELIST)) {
-        std::cerr << "\033[31mERROR:\033[0m Failed to parse " << ENCORE_GAMELIST << std::endl;
+    if (!registry.load_from_json(gamelist_path)) {
+        std::cerr << "\033[31mERROR:\033[0m Failed to parse " << gamelist_path << std::endl;
         return EXIT_FAILURE;
     }
     // stderr output is intentional for module installation
-    std::cerr << ENCORE_GAMELIST << " is valid" << std::endl;
+    std::cerr << gamelist_path << " is valid" << std::endl;
     std::cerr << "Registered games: " << registry.size() << std::endl;
     return EXIT_SUCCESS;
 }

@@ -91,6 +91,13 @@ fi
 if [ -d /data/vendor/thermal ]; then
 	echo '1' > /data/vendor/thermal/thermal-global-mode 2>/dev/null
 	chmod 644 /data/vendor/thermal/thermal-global-mode 2>/dev/null
+
+	# Deploy optimized thermal configs to native Xiaomi runtime path
+	if [ -d "$MODDIR/thermal/config" ]; then
+		mkdir -p /data/vendor/thermal/config
+		cp -f "$MODDIR/thermal/config/"* /data/vendor/thermal/config/ 2>/dev/null
+		chmod 644 /data/vendor/thermal/config/* 2>/dev/null
+	fi
 fi
 resetprop -n persist.vendor.thermal.enable 0 2>/dev/null
 resetprop -n vendor.thermal.enable 0 2>/dev/null
