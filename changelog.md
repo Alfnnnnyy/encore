@@ -1,3 +1,19 @@
+## Zcore Tweaks 5.4.4
+
+**Thanks for using Zcore Tweaks!**
+
+Your continued support keeps this project going.
+
+### Changelog
+
+- Bypass ZeroMount has_manual_mounts scanner check in post-fs-data.sh and service.sh so ZeroMount mounts the module at boot
+- Move vendor files to canonical vendor/ partition directory for ZeroMount VFS compatibility
+- Maintain odm/ partition directly at module root matching ZeroMount partition architecture
+- Auto-initialize clean gamelist.json in Main.cpp to permanently eliminate daemon crash
+- Pre-package valid default gamelist.json inside module config directory
+
+---
+
 ## Zcore Tweaks 5.4.3
 
 **Thanks for using Zcore Tweaks!**

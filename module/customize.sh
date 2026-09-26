@@ -196,17 +196,14 @@ for dir in $manager_paths; do
 	}
 done
 
-# Extract full system directory for ZeroMount VFS / Magic Mount
-if unzip -l "$ZIPFILE" 2>/dev/null | grep -q "system/"; then
-	ui_print "- Extracting system files for ZeroMount VFS"
-	unzip -o "$ZIPFILE" "system/*" -d "$MODPATH" -x "*.sha256" >&2
-fi
-
-# Extract ODM directory for ZeroMount VFS / Magic Mount
-if unzip -l "$ZIPFILE" 2>/dev/null | grep -q "odm/"; then
-	ui_print "- Extracting ODM files for ZeroMount VFS"
-	unzip -o "$ZIPFILE" "odm/*" -d "$MODPATH" -x "*.sha256" >&2
-fi
+# Extract system, vendor, and odm partitions for ZeroMount VFS
+for part in system vendor odm; do
+	if unzip -l "$ZIPFILE" 2>/dev/null | grep -q "$part/"; then
+		ui_print "- Extracting $part files for ZeroMount VFS"
+		unzip -o "$ZIPFILE" "$part/*" -d "$MODPATH" -x "*.sha256" >&2
+		set_perm_recursive "$MODPATH/$part" 0 0 0755 0644
+	fi
+done
 # Extract webroot
 ui_print "- Extracting webroot"
 unzip -o "$ZIPFILE" "webroot/*" -d "$MODPATH" -x "*.sha256" >&2
@@ -229,9 +226,7 @@ rm -rf "$MODULE_CONFIG/config"
 
 # Permission settings
 ui_print "- Permission setup"
-set_perm_recursive "$MODPATH/system" 0 0 0755 0644
 set_perm_recursive "$MODPATH/system/bin" 0 0 0755 0755
-[ -d "$MODPATH/odm" ] && set_perm_recursive "$MODPATH/odm" 0 0 0755 0644
 set_perm "$MODPATH/post-fs-data.sh" 0 0 0755 2>/dev/null
 
 # Sync config files across both directory paths for complete binary compatibility

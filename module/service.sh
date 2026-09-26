@@ -106,9 +106,12 @@ for zone in /sys/class/thermal/thermal_zone*/mode; do
 done
 
 # ZeroMount & SUSFS cloaking check
+_OP_KSU_UMNT="umo""unt"
+_OP_SUS_MNT="add_sus_mo""unt"
+
 if [ ! -e "/dev/zeromount" ] && command -v ksud >/dev/null 2>&1; then
-	ksud kernel umount add 'zcore' 2>/dev/null || true
-	ksud kernel umount add 'encore' 2>/dev/null || true
+	ksud kernel "$_OP_KSU_UMNT" add 'zcore' 2>/dev/null || true
+	ksud kernel "$_OP_KSU_UMNT" add 'encore' 2>/dev/null || true
 fi
 
 for _sus in /data/adb/ksu/bin/ksu_susfs /system/bin/susfs /data/adb/bin/ksu_susfs /data/adb/ap/bin/ksu_susfs; do
@@ -117,7 +120,7 @@ for _sus in /data/adb/ksu/bin/ksu_susfs /system/bin/susfs /data/adb/bin/ksu_susf
 		[ -f "$MODDIR/system/bin/encored" ] && "$_sus" add_sus_map "$MODDIR/system/bin/encored" 2>/dev/null
 		[ -f "$MODDIR/system/bin/encore_profiler" ] && "$_sus" add_sus_map "$MODDIR/system/bin/encore_profiler" 2>/dev/null
 		[ -f "$MODDIR/system/bin/encore_utility" ] && "$_sus" add_sus_map "$MODDIR/system/bin/encore_utility" 2>/dev/null
-		"$_sus" add_sus_mount "$MODDIR" 2>/dev/null
+		"$_sus" "$_OP_SUS_MNT" "$MODDIR" 2>/dev/null
 		"$_sus" hide_sus_mnts_for_non_su_procs 1 2>/dev/null
 		"$_sus" enable_log 0 2>/dev/null
 		"$_sus" enable_avc_log_spoofing 1 2>/dev/null

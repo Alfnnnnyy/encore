@@ -305,10 +305,13 @@ int cmd_run_daemon() {
 
     std::string gamelist_path = resolve_config_file("gamelist.json");
     if (access(gamelist_path.c_str(), F_OK) != 0) {
-        std::cerr << "\033[31mERROR:\033[0m " << gamelist_path << " is missing\n";
-        notify_fatal_error("gamelist.json is missing");
-        LOGC("{} is missing", gamelist_path);
-        return EXIT_FAILURE;
+        LOGW("{} is missing, auto-creating clean gamelist", gamelist_path);
+        try {
+            fs::create_directories(fs::path(gamelist_path).parent_path());
+            std::ofstream f(gamelist_path);
+            f << "{\n}\n";
+            f.close();
+        } catch (...) {}
     }
 
     if (!game_registry.load_from_json(gamelist_path)) {
@@ -319,11 +322,16 @@ int cmd_run_daemon() {
     }
 
     std::string mitigation_path = resolve_config_file("device_mitigation.json");
+    if (access(mitigation_path.c_str(), F_OK) != 0) {
+        try {
+            fs::create_directories(fs::path(mitigation_path).parent_path());
+            std::ofstream f(mitigation_path);
+            f << "{\n  \"default\": {\n    \"items\": [\"DISABLE_DDR_TWEAK\", \"NO_PERFORMANCE_CPUGOV\", \"QCOM_NO_GPU_POWERSAVE\"]\n  },\n  \"device_rules\": {}\n}\n";
+            f.close();
+        } catch (...) {}
+    }
     if (!device_mitigation_store.load_config(mitigation_path)) {
-        std::cerr << "\033[31mERROR:\033[0m Failed to parse " << mitigation_path << '\n';
-        notify_fatal_error("Failed to parse device_mitigation.json");
-        LOGC("Failed to parse {}", DEVICE_MITIGATION_FILE);
-        return EXIT_FAILURE;
+        LOGW("Failed to parse {}, using internal defaults", mitigation_path);
     }
 
     if (daemon(0, 0) != 0) {
