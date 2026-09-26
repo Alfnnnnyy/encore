@@ -170,27 +170,28 @@ extract "$ZIPFILE" "libs/$ARCH_TMP/encored" "$TMPDIR"
 cp "$TMPDIR"/libs/"$ARCH_TMP"/* "$MODPATH/system/bin"
 rm -rf "$TMPDIR/libs"
 
-# Skip mountify
-touch "$MODPATH/skip_mountify"
-
+# For KSU / APatch standalone WebUI
 if [ "$KSU" = "true" ] || [ "$APATCH" = "true" ]; then
-  ui_print "- KSU/AP Detected, skipping module mount (skip_mount)"
 	rm "$MODPATH/action.sh"
-	touch "$MODPATH/skip_mount"
-
-	# symlink ourselves on $PATH
-	manager_paths="/data/adb/ap/bin /data/adb/ksu/bin"
-	BIN_PATH="/data/adb/modules/encore/system/bin"
-	for dir in $manager_paths; do
-		[ -d "$dir" ] && {
-			ui_print "- Creating symlink in $dir"
-			ln -sf "$BIN_PATH/encored" "$dir/encored"
-			ln -sf "$BIN_PATH/encore_profiler" "$dir/encore_profiler"
-			ln -sf "$BIN_PATH/encore_utility" "$dir/encore_utility"
-		}
-	done
 fi
 
+# Symlink ourselves on $PATH
+manager_paths="/data/adb/ap/bin /data/adb/ksu/bin"
+BIN_PATH="/data/adb/modules/encore/system/bin"
+for dir in $manager_paths; do
+	[ -d "$dir" ] && {
+		ui_print "- Creating symlink in $dir"
+		ln -sf "$BIN_PATH/encored" "$dir/encored"
+		ln -sf "$BIN_PATH/encore_profiler" "$dir/encore_profiler"
+		ln -sf "$BIN_PATH/encore_utility" "$dir/encore_utility"
+	}
+done
+
+# Extract full system directory for ZeroMount VFS / Magic Mount
+if unzip -l "$ZIPFILE" 2>/dev/null | grep -q "system/"; then
+	ui_print "- Extracting system files for ZeroMount VFS"
+	unzip -o "$ZIPFILE" "system/*" -d "$MODPATH" -x "*.sha256" >&2
+fi
 # Extract webroot
 ui_print "- Extracting webroot"
 unzip -o "$ZIPFILE" "webroot/*" -d "$MODPATH" -x "*.sha256" >&2
@@ -208,6 +209,7 @@ rm -rf "$MODULE_CONFIG/config"
 
 # Permission settings
 ui_print "- Permission setup"
+set_perm_recursive "$MODPATH/system" 0 0 0755 0644
 set_perm_recursive "$MODPATH/system/bin" 0 0 0755 0755
 set_perm "$MODPATH/post-fs-data.sh" 0 0 0755 2>/dev/null
 
