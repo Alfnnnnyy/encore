@@ -48,6 +48,57 @@ restore_normal_charging() {
 	fi
 }
 
+# Dynamic CPU topology detection for universal CPUSet isolation
+get_little_cpus() {
+	if [ -f /sys/devices/system/cpu/cpufreq/policy0/related_cpus ]; then
+		tr ' ' ',' < /sys/devices/system/cpu/cpufreq/policy0/related_cpus | sed 's/,$//'
+	elif [ -f /sys/devices/system/cpu/cpufreq/policy0/affected_cpus ]; then
+		tr ' ' ',' < /sys/devices/system/cpu/cpufreq/policy0/affected_cpus | sed 's/,$//'
+	else
+		echo "0-2"
+	fi
+}
+
+get_all_cpus() {
+	if [ -f /sys/devices/system/cpu/present ]; then
+		cat /sys/devices/system/cpu/present
+	else
+		echo "0-7"
+	fi
+}
+
+apply_game_cpuset() {
+	[ ! -d "/dev/cpuset" ] && return 0
+	local little
+	little=$(get_little_cpus)
+	local all
+	all=$(get_all_cpus)
+
+	# Isolate background tasks to little cluster to keep big/prime cores pure for game
+	[ -n "$little" ] && apply "$little" /dev/cpuset/background/cpus
+	[ -n "$little" ] && apply "$little" /dev/cpuset/system-background/cpus
+	[ -n "$all" ] && apply "$all" /dev/cpuset/top-app/cpus
+}
+
+restore_game_cpuset() {
+	[ ! -d "/dev/cpuset" ] && return 0
+	local all
+	all=$(get_all_cpus)
+
+	[ -n "$all" ] && apply "$all" /dev/cpuset/background/cpus
+	[ -n "$all" ] && apply "$all" /dev/cpuset/system-background/cpus
+}
+
+apply_uclamp_game() {
+	apply 1 /dev/cpuctl/top-app/cpu.uclamp.latency_sensitive
+	apply 20 /dev/cpuctl/top-app/cpu.uclamp.min
+}
+
+restore_uclamp_game() {
+	apply 0 /dev/cpuctl/top-app/cpu.uclamp.latency_sensitive
+	apply 0 /dev/cpuctl/top-app/cpu.uclamp.min
+}
+
 # SoC recognition
 SOC=$(<$MODULE_CONFIG/soc_recognition)
 
@@ -784,6 +835,16 @@ perfcommon() {
 	# Disable compaction_proactiveness
 	apply 0 /proc/sys/vm/compaction_proactiveness
 
+	# Continuous background writeback: prevents dirty page spikes from freezing games
+	apply 5 /proc/sys/vm/dirty_background_ratio
+	apply 15 /proc/sys/vm/dirty_ratio
+
+	# Prevent kswapd memory reclaim thrashing during gaming asset loads
+	apply 0 /proc/sys/vm/watermark_boost_factor
+
+	restore_game_cpuset
+	restore_uclamp_game
+
 	# Disable SPI CRC
 	apply 0 /sys/module/mmc_core/parameters/use_spi_crc
 
@@ -885,7 +946,9 @@ performance_profile() {
 	6) tegra_performance ;;
 	esac
 
-	echo 3 >/proc/sys/vm/drop_caches
+	# Apply CPUSet isolation and scheduler latency priority for game
+	apply_game_cpuset
+	apply_uclamp_game
 
 	# Engage bypass charging if requested and supported
 	if [ -f "$MODULE_CONFIG/active_game_bypass" ]; then
@@ -903,6 +966,10 @@ performance_profile() {
 balance_profile() {
 	# Restore normal charging if bypass was active
 	restore_normal_charging
+
+	# Restore CPU core assignments and scheduler uclamp to balanced defaults
+	restore_game_cpuset
+	restore_uclamp_game
 
 	# Disable battery saver module
 	[ -f /sys/module/battery_saver/parameters/enabled ] && {
