@@ -1,3 +1,18 @@
+## Encore Tweaks 5.3.1
+
+**Thanks for using Encore Tweaks!**
+
+Your continued support keeps this project going. If you enjoy the improvements and want to see more features in the future, [consider supporting the developer with a small donation](https://t.me/rem01schannel/670). Every bit helps!
+
+### Changelog
+
+- Implement complete SuSFS v2.3+ kernel stealth suite (add_sus_path_loop, add_sus_map, add_sus_mount, add_try_umount, hide_sus_mnts, enable_avc_log_spoofing, kstat full clone)
+- Enable full ZeroMount VFS metamodule compatibility (remove legacy skip_mount & skip_mountify flags)
+- Restructure system modifications and thermal profiles under system/ for seamless ZeroMount kernel redirection
+- Ensure reliable daemon startup with absolute module path execution and PATH export
+
+---
+
 ## Encore Tweaks 5.3.0
 
 **Thanks for using Encore Tweaks!**
