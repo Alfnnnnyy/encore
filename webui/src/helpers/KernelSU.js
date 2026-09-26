@@ -10,6 +10,14 @@ export function isKSUWebUI() {
 }
 
 /**
+ * Check if shortcut creation API is supported by the manager
+ * @returns {boolean}
+ */
+export function isShortcutSupported() {
+  return typeof ksu !== 'undefined' && typeof ksu.createShortcut === 'function'
+}
+
+/**
  * Check if running on WebUI X
  * @returns {boolean}
  */

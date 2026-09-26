@@ -122,6 +122,7 @@ static void clear_dnd_if_needed(DaemonState &state) {
         set_do_not_disturb(state.prev_dnd_state);
         state.game_requested_dnd = false;
     }
+    system("encore_utility set_bypass_charging 0");
 }
 
 [[nodiscard]] static bool apply_game_profile(DaemonState &state) {
@@ -157,6 +158,12 @@ static void clear_dnd_if_needed(DaemonState &state) {
     } else {
         state.game_requested_dnd = false;
         set_do_not_disturb(state.prev_dnd_state);
+    }
+
+    if (active_game->enable_bypass_charging) {
+        system("encore_utility set_bypass_charging 1");
+    } else {
+        system("encore_utility set_bypass_charging 0");
     }
     return true;
 }

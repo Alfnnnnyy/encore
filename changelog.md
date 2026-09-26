@@ -1,3 +1,18 @@
+## Zcore Tweaks 5.4.5
+
+**Thanks for using Zcore Tweaks!**
+
+Your continued support keeps this project going.
+
+### Changelog
+
+- Fix Bypass Charging toggle persistence in gamelist.json across WebUI sessions
+- Wire automatic bypass charging activation and cleanup into C++ daemon game lifecycle
+- Hide Create Shortcut button on managers without ksu.createShortcut API support (KernelSU-Next, ReSukiSU)
+- Refine daemon fallback and config synchronization across all execution stages
+
+---
+
 ## Zcore Tweaks 5.4.4
 
 **Thanks for using Zcore Tweaks!**

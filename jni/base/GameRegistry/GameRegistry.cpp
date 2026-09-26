@@ -83,6 +83,12 @@ bool GameRegistry::load_from_json(const std::string &filename) {
             continue;
         }
 
+        if (game_obj.HasMember("enable_bypass_charging") && game_obj["enable_bypass_charging"].IsBool()) {
+            game.enable_bypass_charging = game_obj["enable_bypass_charging"].GetBool();
+        } else {
+            game.enable_bypass_charging = false;
+        }
+
         if (game_obj.HasMember("lite_mode") && game_obj["lite_mode"].IsBool()) {
             game.lite_mode = game_obj["lite_mode"].GetBool();
         } else {
@@ -128,6 +134,7 @@ bool GameRegistry::populate_from_base(const std::string &gamelist, const std::st
             game.package_name = std::move(package_name);
             game.lite_mode = false;
             game.enable_dnd = false;
+            game.enable_bypass_charging = false;
             game_list.push_back(std::move(game));
         }
     }
@@ -142,6 +149,7 @@ bool GameRegistry::populate_from_base(const std::string &gamelist, const std::st
         rapidjson::Value game_obj(rapidjson::kObjectType);
         game_obj.AddMember("lite_mode", game.lite_mode, allocator);
         game_obj.AddMember("enable_dnd", game.enable_dnd, allocator);
+        game_obj.AddMember("enable_bypass_charging", game.enable_bypass_charging, allocator);
 
         rapidjson::Value key(game.package_name.c_str(), allocator);
         doc.AddMember(key, game_obj, allocator);

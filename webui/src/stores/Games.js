@@ -102,6 +102,7 @@ export const useGamesStore = defineStore('games', () => {
       currentConfig[packageName] = {
         lite_mode: !!config.lite_mode,
         enable_dnd: !!config.enable_dnd,
+        enable_bypass_charging: !!config.enable_bypass_charging,
       }
     } else {
       delete currentConfig[packageName]
