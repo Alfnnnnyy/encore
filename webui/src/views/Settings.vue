@@ -183,7 +183,7 @@
             </RippleComponent>
           </div>
 
-          <div v-if="isShortcutSupported" class="md3-list">
+          <div class="md3-list">
             <RippleComponent @click="createShortcut" class="md3-list-item" tabindex="0">
               <div class="flex items-center justify-between px-5 py-4">
                 <div class="flex items-center gap-4 min-w-0 flex-1">
@@ -296,7 +296,6 @@ const openLanguageView = () => router.push('/settings/language')
 const openDeviceMitigationView = () => router.push('/settings/device_mitigation')
 const openLogLvlView = () => router.push('/settings/log_level')
 const openDisableTweaksView = () => router.push('/settings/disable_tweaks')
-const isShortcutSupported = KernelSU.isShortcutSupported()
 const createShortcut = () => KernelSU.createShortcut()
 
 const openExportModal = () => {

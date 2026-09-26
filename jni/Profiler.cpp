@@ -66,9 +66,15 @@ void set_profiler_env_vars() {
     setenv("ENCORE_POWERSAVE_CPUGOV", cpu_governor_preference.powersave.c_str(), 1);
 }
 
+static void sync_profile_state(EncoreProfileMode mode, const std::string &info_content) {
+    write2file(GAME_INFO, info_content);
+    write2file(PROFILE_MODE, static_cast<int>(mode), "\n");
+    write2file(LEGACY_CONFIG_DIR "/gameinfo", info_content);
+    write2file(LEGACY_CONFIG_DIR "/current_profile", static_cast<int>(mode), "\n");
+}
+
 void run_perfcommon(void) {
-    write2file(GAME_INFO, "NULL 0 0\n");
-    write2file(PROFILE_MODE, static_cast<int>(PERFCOMMON), "\n");
+    sync_profile_state(PERFCOMMON, "NULL 0 0\n");
 
     if (config_store.get_preferences().disable_tweaks) {
         LOGI_TAG("Profiler", "Tweaks are disabled in config, skipping perfcommon");
@@ -83,8 +89,7 @@ void run_perfcommon(void) {
 }
 
 void apply_performance_profile(bool lite_mode, std::string game_pkg, pid_t game_pid, uid_t game_uid) {
-    write2file(GAME_INFO, game_pkg, " ", game_pid, " ", game_uid, "\n");
-    write2file(PROFILE_MODE, static_cast<int>(PERFORMANCE_PROFILE), "\n");
+    sync_profile_state(PERFORMANCE_PROFILE, game_pkg + " " + std::to_string(game_pid) + " " + std::to_string(game_uid) + "\n");
 
     if (config_store.get_preferences().disable_tweaks) {
         LOGI_TAG("Profiler", "Tweaks are disabled in config, skipping performance profile");
@@ -107,8 +112,7 @@ void apply_performance_profile(bool lite_mode, std::string game_pkg, pid_t game_
 }
 
 void apply_balance_profile() {
-    write2file(GAME_INFO, "NULL 0 0\n");
-    write2file(PROFILE_MODE, static_cast<int>(BALANCE_PROFILE), "\n");
+    sync_profile_state(BALANCE_PROFILE, "NULL 0 0\n");
 
     if (config_store.get_preferences().disable_tweaks) {
         LOGI_TAG("Profiler", "Tweaks are disabled in config, skipping balance profile");
@@ -123,8 +127,7 @@ void apply_balance_profile() {
 }
 
 void apply_powersave_profile() {
-    write2file(GAME_INFO, "NULL 0 0\n");
-    write2file(PROFILE_MODE, static_cast<int>(POWERSAVE_PROFILE), "\n");
+    sync_profile_state(POWERSAVE_PROFILE, "NULL 0 0\n");
 
     if (config_store.get_preferences().disable_tweaks) {
         LOGI_TAG("Profiler", "Tweaks are disabled in config, skipping powersave profile");

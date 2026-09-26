@@ -3,8 +3,28 @@ import { ref } from 'vue'
 import { exec } from 'kernelsu'
 import * as KernelSU from '@/helpers/KernelSU'
 
-const configPath = '/data/adb/.config/encore'
-const modPath = '/data/adb/modules/encore'
+async function getConfigDir() {
+  if (await KernelSU.fileExists('/data/adb/.config/zcore/current_profile')) {
+    return '/data/adb/.config/zcore'
+  }
+  if (await KernelSU.fileExists('/data/adb/.config/encore/current_profile')) {
+    return '/data/adb/.config/encore'
+  }
+  if (await KernelSU.fileExists('/data/adb/.config/zcore')) {
+    return '/data/adb/.config/zcore'
+  }
+  return '/data/adb/.config/encore'
+}
+
+async function getModDir() {
+  if (await KernelSU.fileExists('/data/adb/modules/zcore/module.prop')) {
+    return '/data/adb/modules/zcore'
+  }
+  if (await KernelSU.fileExists('/data/adb/modules/encore/module.prop')) {
+    return '/data/adb/modules/encore'
+  }
+  return '/data/adb/modules/zcore'
+}
 
 export const useHomeStore = defineStore('home', () => {
   const daemonPidRaw = ref('')
@@ -121,7 +141,8 @@ export const useHomeStore = defineStore('home', () => {
 
   async function getModuleVersion() {
     try {
-      const propPath = `${modPath}/module.prop`
+      const dir = await getModDir()
+      const propPath = `${dir}/module.prop`
       const content = await KernelSU.readFile(propPath)
       const match = content.match(/^version=(.*)$/m)
       moduleVersion.value = match ? match[1].trim() : 'unknown'
@@ -132,7 +153,8 @@ export const useHomeStore = defineStore('home', () => {
 
   async function getCurrentProfile() {
     try {
-      const output = await KernelSU.readFile(`${configPath}/current_profile`)
+      const dir = await getConfigDir()
+      const output = await KernelSU.readFile(`${dir}/current_profile`)
       currentProfileRaw.value = getProfileKey(output.trim())
     } catch (error) {
       currentProfileRaw.value = 'unknown'

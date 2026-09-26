@@ -26,11 +26,22 @@ export const useEncoreConfigStore = defineStore('encoreConfig', () => {
 
   const isLoaded = computed(() => config.value !== null)
 
-  const configPath = '/data/adb/.config/encore/config.json'
+  async function getConfigFile() {
+    if (await KernelSU.fileExists('/data/adb/.config/zcore/config.json')) {
+      return '/data/adb/.config/zcore/config.json'
+    }
+    if (await KernelSU.fileExists('/data/adb/.config/encore/config.json')) {
+      return '/data/adb/.config/encore/config.json'
+    }
+    return '/data/adb/.config/zcore/config.json'
+  }
+
+  let activeConfigFile = '/data/adb/.config/zcore/config.json'
 
   async function loadConfig() {
     try {
-      const content = await KernelSU.readFile(configPath)
+      activeConfigFile = await getConfigFile()
+      const content = await KernelSU.readFile(activeConfigFile)
       config.value = JSON.parse(content)
       console.log('Encore config loaded successfully')
       return config.value
@@ -48,7 +59,9 @@ export const useEncoreConfigStore = defineStore('encoreConfig', () => {
 
     try {
       const configString = JSON.stringify(config.value, null, 2)
-      await KernelSU.writeFile(configPath, configString)
+      await KernelSU.writeFile(activeConfigFile, configString)
+      // Also sync to legacy if directory exists
+      await exec(`[ -d /data/adb/.config/encore ] && cp -f "${activeConfigFile}" /data/adb/.config/encore/config.json 2>/dev/null; [ -d /data/adb/.config/zcore ] && cp -f "${activeConfigFile}" /data/adb/.config/zcore/config.json 2>/dev/null`).catch(() => {})
       console.log('Encore config saved successfully')
       return true
     } catch (error) {

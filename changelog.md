@@ -1,3 +1,19 @@
+## Zcore Tweaks 5.4.6
+
+**Thanks for using Zcore Tweaks!**
+
+Your continued support keeps this project going.
+
+### Changelog
+
+- Fix game mode detection and profile sync between C++ daemon and WebUI
+- Dual-write current_profile and gameinfo across both zcore and encore config paths
+- Resolve WebUI Home store reading wrong legacy path for module version and current profile
+- Restore Create Shortcut button unconditionally in Settings view
+- Fix exec import in EncoreConfig store
+
+---
+
 ## Zcore Tweaks 5.4.5
 
 **Thanks for using Zcore Tweaks!**
