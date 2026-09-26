@@ -8,9 +8,9 @@
             "daemon_inactive": "服务未启用",
             "loading_daemon": "请稍候…"
         },
-        "title": "Encore Tweaks",
+        "title": "Zcore Tweaks",
         "info_card": {
-            "module": "Encore Tweaks",
+            "module": "Zcore Tweaks",
             "profile": "当前配置",
             "kernel": "内核",
             "chipset": "芯片组",
@@ -18,11 +18,11 @@
         },
         "support_button": {
             "title": "支持开发",
-            "description": "Encore Tweaks 对所有人永远免费。如果你觉得好用，可以通过捐赠来表达你的支持。"
+            "description": "Zcore Tweaks 对所有人永远免费。如果你觉得好用，可以通过捐赠来表达你的支持。"
         },
         "learn_encore": {
-            "title": "了解 Encore",
-            "description": "了解如何使用 Encore Tweaks 及其功能。"
+            "title": "了解 Zcore",
+            "description": "了解如何使用 Zcore Tweaks 及其功能。"
         }
     },
     "toast": {
@@ -57,26 +57,26 @@
         },
         "device_mitigation": {
             "title": "设备兼容模式",
-            "description": "缓解 Encore Tweaks 中设备特定的兼容问题"
+            "description": "缓解 Zcore Tweaks 中设备特定的兼容问题"
         },
         "log_level": {
             "title": "日志级别",
-            "description": "选择 Encore Tweaks 操作日志的详细程度"
+            "description": "选择 Zcore Tweaks 操作日志的详细程度"
         },
         "save_log": {
             "title": "保存日志",
-            "description": "导出 Encore Tweaks 的操作日志",
+            "description": "导出 Zcore Tweaks 的操作日志",
             "exporting": "正在打包日志，请稍候…",
             "success": "日志保存成功",
             "failure": "日志保存失败"
         },
         "create_shortcut": {
             "title": "创建快捷方式",
-            "description": "在主屏幕创建一个快捷方式以快速访问 Encore Tweaks"
+            "description": "在主屏幕创建一个快捷方式以快速访问 Zcore Tweaks"
         },
         "disable_tweaks": {
             "title": "禁用 Tweaks",
-            "description": "禁用 Encore Tweaks 的性能优化"
+            "description": "禁用 Zcore Tweaks 的性能优化"
         }
     },
     "game_settings": {
@@ -131,7 +131,7 @@
     "disable_tweaks": {
         "title": "禁用 Tweaks",
         "toggle_title": "禁用 Tweaks",
-        "brief": "启用后，该设置会关闭 Encore Tweaks 的所有内置性能优化，允许你将该模块严格用作 Encore 附加模块的宿主模块。"
+        "brief": "启用后，该设置会关闭 Zcore Tweaks 的所有内置性能优化，允许你将该模块严格用作 Zcore 附加模块的宿主模块。"
     },
     "reboot_modal": {
         "title": "需要重启",

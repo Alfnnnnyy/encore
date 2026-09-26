@@ -18,7 +18,7 @@
 SKIPUNZIP=1
 SOC=0
 
-MODULE_CONFIG="/data/adb/.config/encore"
+MODULE_CONFIG="/data/adb/.config/zcore"
 
 make_node() {
 	[ ! -f "$2" ] && echo "$1" >"$2"
@@ -31,7 +31,7 @@ make_dir() {
 abort_unsupported_arch() {
 	ui_print "*********************************************************"
 	ui_print "! Unsupported Architecture: $ARCH"
-	ui_print "! Your CPU architecture is not supported by Encore Tweaks."
+	ui_print "! Your CPU architecture is not supported by Zcore Tweaks."
 	abort "*********************************************************"
 }
 
@@ -177,7 +177,7 @@ fi
 
 # Symlink ourselves on $PATH
 manager_paths="/data/adb/ap/bin /data/adb/ksu/bin"
-BIN_PATH="/data/adb/modules/encore/system/bin"
+BIN_PATH="$MODPATH/system/bin"
 for dir in $manager_paths; do
 	[ -d "$dir" ] && {
 		ui_print "- Creating symlink in $dir"
@@ -198,10 +198,15 @@ unzip -o "$ZIPFILE" "webroot/*" -d "$MODPATH" -x "*.sha256" >&2
 
 # Mitigate root detection
 [ -d /data/encore ] && rm -rf /data/encore
+[ -d /data/zcore ] && rm -rf /data/zcore
 [ -f /data/local/tmp/encore_logo.png ] && rm -f /data/local/tmp/encore_logo.png
 
 # Set configs
-ui_print "- Encore Tweaks configuration setup"
+ui_print "- Zcore Tweaks configuration setup"
+if [ -d "/data/adb/.config/encore" ] && [ ! -d "$MODULE_CONFIG" ]; then
+	ui_print "- Migrating configuration from Encore"
+	cp -r /data/adb/.config/encore "$MODULE_CONFIG"
+fi
 make_dir "$MODULE_CONFIG"
 unzip -o "$ZIPFILE" "config/*" -d "$MODULE_CONFIG" -x "*.sha256" >&2
 mv "$MODULE_CONFIG/config/"* "$MODULE_CONFIG/"

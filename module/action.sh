@@ -16,24 +16,24 @@
 
 if [ -n "$MMRL" ]; then
 	echo "- This action script is not intended to run on MMRL."
-	echo "- Please open Encore Tweaks WebUI by clicking the module card."
+	echo "- Please open Zcore Tweaks WebUI by clicking the module card."
 	exit 0
 fi
 
 if [ -n "$MAGISKTMP" ]; then
 	pm path io.github.a13e300.ksuwebui >/dev/null 2>&1 && {
 		echo "- Launching WebUI in KSUWebUIStandalone..."
-		am start -n "io.github.a13e300.ksuwebui/.WebUIActivity" -e id "encore"
+		am start -n "io.github.a13e300.ksuwebui/.WebUIActivity" -e id "zcore"
 		exit 0
 	}
 	pm path com.dergoogler.mmrl.wx >/dev/null 2>&1 && {
 		echo "- Launching WebUI in WebUI X..."
-		am start -n "com.dergoogler.mmrl.wx/.ui.activity.webui.WebUIActivity" -e MOD_ID "encore"
+		am start -n "com.dergoogler.mmrl.wx/.ui.activity.webui.WebUIActivity" -e MOD_ID "zcore"
 		exit 0
 	}
 	pm path com.dergoogler.mmrl.webuix >/dev/null 2>&1 && {
 		echo "- Launching WebUI in WebUI X..."
-		am start -n "com.dergoogler.mmrl.webuix/.ui.activity.webui.WebUIActivity" -e MOD_ID "encore"
+		am start -n "com.dergoogler.mmrl.webuix/.ui.activity.webui.WebUIActivity" -e MOD_ID "zcore"
 		exit 0
 	}
 fi

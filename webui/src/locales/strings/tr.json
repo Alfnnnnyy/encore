@@ -16,11 +16,11 @@
         },
         "support_button": {
             "title": "Beni Destekle",
-            "description": "Encore Tweaks, her zaman, sizin ve herkes için ücretsiz olmuştur ve öyle kalacaktır. Ancak bir bağış yaparak bana destek olduğunuzu gösterebilirsiniz."
+            "description": "Zcore Tweaks, her zaman, sizin ve herkes için ücretsiz olmuştur ve öyle kalacaktır. Ancak bir bağış yaparak bana destek olduğunuzu gösterebilirsiniz."
         },
         "learn_encore": {
-            "title": "Encore'u Öğren",
-            "description": "Encore Tweaks'i ve özelliklerini nasıl kullanıcağınızı öğrenin."
+            "title": "Zcore'u Öğren",
+            "description": "Zcore Tweaks'i ve özelliklerini nasıl kullanıcağınızı öğrenin."
         }
     },
     "games_page": {
@@ -47,26 +47,26 @@
         },
         "device_mitigation": {
             "title": "Cihaz seviyesinde zarar azaltma",
-            "description": "Encore Tweaks'e özgü cihaz hatalarını azaltır"
+            "description": "Zcore Tweaks'e özgü cihaz hatalarını azaltır"
         },
         "log_level": {
             "title": "Günlük Seviyesi",
-            "description": "Encore Tweaks log ayrıntı düzeyini seçin"
+            "description": "Zcore Tweaks log ayrıntı düzeyini seçin"
         },
         "save_log": {
             "title": "Günlüğü Kaydet",
-            "description": "Encore Tweaks günlüğünü dışa aktar",
+            "description": "Zcore Tweaks günlüğünü dışa aktar",
             "exporting": "Günlükler paketleniyor, lütfen bekleyin…",
             "success": "Günlük başarıyla kaydedildi",
             "failure": "Günlük kaydedilemedi"
         },
         "create_shortcut": {
             "title": "Kısayol Oluştur",
-            "description": "Hızlı erişim için Encore Tweaks'in kısayolunu ana ekrana ekleyin"
+            "description": "Hızlı erişim için Zcore Tweaks'in kısayolunu ana ekrana ekleyin"
         },
         "disable_tweaks": {
             "title": "Özelleştirmeleri kapat",
-            "description": "Encore Tweaks tarafından ayarlanan tüm performans iyileştirmelerini devre dışı bırakın"
+            "description": "Zcore Tweaks tarafından ayarlanan tüm performans iyileştirmelerini devre dışı bırakın"
         }
     },
     "profiles": {
@@ -129,7 +129,7 @@
     "disable_tweaks": {
         "title": "Özelleştirmeleri kapat",
         "toggle_title": "Özelleştirmeleri kapat",
-        "brief": "Etkinleştirildiğinde bu ayar, Encore Tweaks üzerindeki tüm yerleşik performans optimizasyonlarını kapatır ve bu modülü yalnızca Encore Addon modülleri için bir host olarak kullanmanıza olanak tanır."
+        "brief": "Etkinleştirildiğinde bu ayar, Zcore Tweaks üzerindeki tüm yerleşik performans optimizasyonlarını kapatır ve bu modülü yalnızca Zcore Addon modülleri için bir host olarak kullanmanıza olanak tanır."
     },
     "reboot_modal": {
         "title": "Yeniden başlatılması gerekiyor",

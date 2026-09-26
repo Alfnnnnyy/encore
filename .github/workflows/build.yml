@@ -25,6 +25,8 @@ jobs:
   build:
     name: Build Flashable Zip
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -54,10 +56,21 @@ jobs:
         id: compileZip
         run: bash .github/scripts/compile_zip.sh
 
+      - name: Commit Dynamic update.json
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add update.json
+          if ! git diff --staged --quiet; then
+            git commit -m "chore: dynamic update.json for v${{ steps.compileZip.outputs.version }} [skip ci]"
+            git push origin main
+          fi
+
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v7
         with:
-          name: encore-build
+          name: zcore-build
           path: ${{ steps.compileZip.outputs.zipName }}
 
       - name: Upload To Telegram
@@ -69,7 +82,7 @@ jobs:
           COMMIT_URL: ${{ github.event.head_commit.url }}
           BRANCH: ${{ github.ref_name }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          TITLE: Encore Tweaks
+          TITLE: Zcore Tweaks
         run: |
           export VERSION=$(git rev-list --count HEAD)
           bash .github/scripts/telegram_bot.sh ${{ steps.compileZip.outputs.zipName }}

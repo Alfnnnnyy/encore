@@ -17,8 +17,11 @@
 MODDIR=$(dirname "$0")
 export PATH="$MODDIR/system/bin:/data/adb/ksu/bin:/data/adb/ap/bin:$PATH"
 
-MODULE_CONFIG="/data/adb/.config/encore"
-CLEANUP_SCRIPT="/data/adb/service.d/.encore_cleanup.sh"
+MODULE_CONFIG="/data/adb/.config/zcore"
+CLEANUP_SCRIPT="/data/adb/service.d/.zcore_cleanup.sh"
+if [ -d "/data/adb/.config/encore" ] && [ ! -d "$MODULE_CONFIG" ]; then
+	cp -r /data/adb/.config/encore "$MODULE_CONFIG"
+fi
 CPUFREQ="/sys/devices/system/cpu/cpu0/cpufreq"
 
 # Restore original module.prop
@@ -27,7 +30,7 @@ CPUFREQ="/sys/devices/system/cpu/cpu0/cpufreq"
 }
 
 # Clear old logs
-rm -f "$MODULE_CONFIG/encore.log" "$MODULE_CONFIG/sysmon.log"
+rm -f "$MODULE_CONFIG/zcore.log" "$MODULE_CONFIG/encore.log" "$MODULE_CONFIG/sysmon.log"
 
 # Parse Governor to use
 chmod 644 "$CPUFREQ/scaling_governor"
@@ -97,6 +100,7 @@ done
 
 # ZeroMount & SUSFS cloaking check
 if [ ! -e "/dev/zeromount" ] && command -v ksud >/dev/null 2>&1; then
+	ksud kernel umount add 'zcore' 2>/dev/null || true
 	ksud kernel umount add 'encore' 2>/dev/null || true
 fi
 

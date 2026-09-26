@@ -1,3 +1,20 @@
+## Zcore Tweaks 5.4.0
+
+**Thanks for using Zcore Tweaks!**
+
+Your continued support keeps this project going.
+
+### Changelog
+
+- Rebranded project identity to Zcore Tweaks (Author: Alfnnnnyy, base by Rem01Gaming)
+- Dynamic update.json automation on GitHub Actions with live update URL to Alfnnnnyy/encore
+- ZeroMount VFS metamodule full compatibility (eliminated skip_mount & skip_mountify flags)
+- Full SuSFS v2.3+ kernel stealth suite (add_sus_path_loop, add_sus_map, add_sus_mount, add_try_umount, hide_sus_mnts, enable_avc_log_spoofing, kstat full clone)
+- Restructured thermal engine profiles under system/ for seamless ZeroMount kernel VFS redirection
+- Updated WebUI branding and localized string translations across all 11 supported languages
+
+---
+
 ## Encore Tweaks 5.3.1
 
 **Thanks for using Encore Tweaks!**

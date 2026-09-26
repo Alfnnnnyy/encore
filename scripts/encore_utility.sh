@@ -18,7 +18,8 @@
 # shellcheck disable=SC2317,SC3006,SC3018,SC3034,SC3057,SC3037
 
 # Config dir
-MODULE_CONFIG="/data/adb/.config/encore"
+MODULE_CONFIG="/data/adb/.config/zcore"
+[ ! -d "$MODULE_CONFIG" ] && [ -d "/data/adb/.config/encore" ] && MODULE_CONFIG="/data/adb/.config/encore"
 
 change_cpu_gov() {
 	chmod 644 /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
@@ -30,10 +31,10 @@ change_cpu_gov() {
 }
 
 save_logs() {
-	report_dir="$MODULE_CONFIG/encore_bugreport_temp"
+	report_dir="$MODULE_CONFIG/zcore_bugreport_temp"
 	mkdir -p "$report_dir/pstore"
 
-	log_file="encore_bugreport_$(date +"%Y-%m-%d_%H_%M").tar.gz"
+	log_file="zcore_bugreport_$(date +"%Y-%m-%d_%H_%M").tar.gz"
 	SOC="Unknown"
 
 	case $(<$MODULE_CONFIG/soc_recognition) in
@@ -49,14 +50,15 @@ save_logs() {
 
 	{
 		echo "*****************************************************"
-		echo "Encore Tweaks Log"
-		echo "Module Version: $(awk -F'=' '/version=/ {print $2}' /data/adb/modules/encore/module.prop)"
+		echo "Zcore Tweaks Log"
+		[ -f /data/adb/modules/zcore/module.prop ] && echo "Module Version: $(awk -F'=' '/version=/ {print $2}' /data/adb/modules/zcore/module.prop)" || echo "Module Version: $(awk -F'=' '/version=/ {print $2}' /data/adb/modules/encore/module.prop 2>/dev/null)"
 		echo "Chipset: $SOC $(getprop ro.board.platform)"
 		echo "Fingerprint: $(getprop ro.build.fingerprint)"
 		echo "Android SDK: $(getprop ro.build.version.sdk)"
 		echo "Kernel: $(uname -r -m)"
 		echo "*****************************************************"
 		echo ""
+		[ -f "$MODULE_CONFIG/zcore.log" ] && cat "$MODULE_CONFIG/zcore.log"
 		[ -f "$MODULE_CONFIG/encore.log" ] && cat "$MODULE_CONFIG/encore.log"
 	} >"$report_dir/encore.log"
 

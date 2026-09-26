@@ -1,9 +1,12 @@
 # Third Party Notices
 
-This project, Encore Tweaks, incorporates code from the following open source projects.
+This project, Zcore Tweaks (maintained by Alfnnnnyy), incorporates and builds upon code from the following open source projects.
 
 ## Apache License 2.0
-This project, Encore Tweaks, is licensed under the Apache License, Version 2.0.
+This project is licensed under the Apache License, Version 2.0.
+
+    Copyright (C) 2026 Alfnnnnyy (Zcore Tweaks)
+    Copyright (C) 2024-2026 Rem01Gaming (Encore Tweaks)
 
     Copyright (C) 2024-2025 Rem01Gaming
 

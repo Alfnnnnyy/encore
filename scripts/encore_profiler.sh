@@ -22,7 +22,8 @@
 ###################################
 
 # Config dir
-MODULE_CONFIG="/data/adb/.config/encore"
+MODULE_CONFIG="/data/adb/.config/zcore"
+[ ! -d "$MODULE_CONFIG" ] && [ -d "/data/adb/.config/encore" ] && MODULE_CONFIG="/data/adb/.config/encore"
 
 # SoC recognition
 SOC=$(<$MODULE_CONFIG/soc_recognition)

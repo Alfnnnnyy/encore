@@ -8,7 +8,7 @@
         "success_save_log": "Los registros se guardaron correctamente en {path}"
     },
     "home_page": {
-        "title": "Encore Tweaks",
+        "title": "Zcore Tweaks",
         "status_card": {
             "running": "Ejecutándose ✨",
             "stopped": "Detenido 💤",
@@ -18,7 +18,7 @@
             "loading_daemon": "Un momento por favor…"
         },
         "info_card": {
-            "module": "Encore Tweaks",
+            "module": "Zcore Tweaks",
             "profile": "Perfil actual",
             "kernel": "Kernel",
             "chipset": "Chipset",
@@ -26,11 +26,11 @@
         },
         "support_button": {
             "title": "Apóyame",
-            "description": "Encore Tweaks es, y siempre será, gratuito para ti y para todos. Sin embargo, puedes demostrar que te importa haciendo una donación."
+            "description": "Zcore Tweaks es, y siempre será, gratuito para ti y para todos. Sin embargo, puedes demostrar que te importa haciendo una donación."
         },
         "learn_encore": {
-            "title": "Aprende sobre Encore",
-            "description": "Aprende cómo usar Encore Tweaks y sus funciones."
+            "title": "Aprende sobre Zcore",
+            "description": "Aprende cómo usar Zcore Tweaks y sus funciones."
         }
     },
     "games_page": {
@@ -57,26 +57,26 @@
         },
         "device_mitigation": {
             "title": "Mitigación de Dispositivo",
-            "description": "Mitiga problemas específicos del dispositivo en Encore Tweaks"
+            "description": "Mitiga problemas específicos del dispositivo en Zcore Tweaks"
         },
         "log_level": {
             "title": "Nivel de Registro",
-            "description": "Elige qué tan detallado debe ser el registro operativo de Encore Tweaks"
+            "description": "Elige qué tan detallado debe ser el registro operativo de Zcore Tweaks"
         },
         "save_log": {
             "title": "Guardar Registro",
-            "description": "Exporta el registro operativo de Encore Tweaks",
+            "description": "Exporta el registro operativo de Zcore Tweaks",
             "exporting": "Empaquetando registros, por favor espere…",
             "success": "Registro guardado con éxito",
             "failure": "Error al guardar el registro"
         },
         "create_shortcut": {
             "title": "Crear Atajo",
-            "description": "Crear un atajo en la pantalla de inicio para un acceso rápido a Encore Tweaks"
+            "description": "Crear un atajo en la pantalla de inicio para un acceso rápido a Zcore Tweaks"
         },
         "disable_tweaks": {
             "title": "Desactivar correcciones",
-            "description": "Desactivar todos los ajustes de rendimiento configurados por Encore Tweaks"
+            "description": "Desactivar todos los ajustes de rendimiento configurados por Zcore Tweaks"
         }
     },
     "game_settings": {
@@ -131,7 +131,7 @@
     "disable_tweaks": {
         "title": "Desactivar Tweaks",
         "toggle_title": "Desactivar Tweaks",
-        "brief": "Cuando se activa, esta opción desactiva todas las optimizaciones de rendimiento de Encore Tweaks, lo que te permite utilizar este módulo exclusivamente como host para los módulos complementarios de Encore."
+        "brief": "Cuando se activa, esta opción desactiva todas las optimizaciones de rendimiento de Zcore Tweaks, lo que te permite utilizar este módulo exclusivamente como host para los módulos complementarios de Zcore."
     },
     "reboot_modal": {
         "title": "Reinicio Requerido",

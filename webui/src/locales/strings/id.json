@@ -1,6 +1,6 @@
 {
     "home_page": {
-        "title": "Encore Tweaks",
+        "title": "Zcore Tweaks",
         "status_card": {
             "running": "Berfungsi ✨",
             "stopped": "Terhenti 💤",
@@ -10,7 +10,7 @@
             "loading_daemon": "Sedang memuat…"
         },
         "info_card": {
-            "module": "Encore Tweaks",
+            "module": "Zcore Tweaks",
             "profile": "Profil Saat Ini",
             "kernel": "Kernel",
             "chipset": "Chipset",
@@ -18,11 +18,11 @@
         },
         "support_button": {
             "title": "Dukung Saya",
-            "description": "Encore Tweaks akan selalu gratis untuk semua orang. Namun Anda dapat menunjukkan kepedulian Anda dengan memberikan donasi."
+            "description": "Zcore Tweaks akan selalu gratis untuk semua orang. Namun Anda dapat menunjukkan kepedulian Anda dengan memberikan donasi."
         },
         "learn_encore": {
-            "title": "Pelajari Encore",
-            "description": "Pelajari cara menggunakan Encore Tweaks dan fitur-fiturnya."
+            "title": "Pelajari Zcore",
+            "description": "Pelajari cara menggunakan Zcore Tweaks dan fitur-fiturnya."
         }
     },
     "games_page": {
@@ -49,26 +49,26 @@
         },
         "device_mitigation": {
             "title": "Mitigasi Perangkat",
-            "description": "Atasi masalah spesifik perangkat di Encore Tweaks"
+            "description": "Atasi masalah spesifik perangkat di Zcore Tweaks"
         },
         "log_level": {
             "title": "Log Level",
-            "description": "Pilih seberapa detail log operasional Encore Tweaks"
+            "description": "Pilih seberapa detail log operasional Zcore Tweaks"
         },
         "save_log": {
             "title": "Simpan Log",
-            "description": "Ekspor log operasional Encore Tweaks",
+            "description": "Ekspor log operasional Zcore Tweaks",
             "exporting": "Menyimpan log, tunggu sebentar ya…",
             "success": "Log berhasil disimpan",
             "failure": "Gagal menyimpan log"
         },
         "create_shortcut": {
             "title": "Buat Pintasan",
-            "description": "Buat pintasan di layar utama untuk akses cepat ke Encore Tweaks"
+            "description": "Buat pintasan di layar utama untuk akses cepat ke Zcore Tweaks"
         },
         "disable_tweaks": {
             "title": "Matikan Tweak",
-            "description": "Nonaktifkan semua penyesuaian performa yang diatur oleh Encore Tweaks"
+            "description": "Nonaktifkan semua penyesuaian performa yang diatur oleh Zcore Tweaks"
         }
     },
     "game_settings": {
@@ -138,7 +138,7 @@
     "disable_tweaks": {
         "title": "Matikan Tweak",
         "toggle_title": "Matikan Tweak",
-        "brief": "Saat diaktifkan, pengaturan ini akan menonaktifkan semua tweak performa bawaan pada Encore Tweaks, sehingga Anda dapat menggunakan modul ini murni sebagai host untuk modul Add-on."
+        "brief": "Saat diaktifkan, pengaturan ini akan menonaktifkan semua tweak performa bawaan pada Zcore Tweaks, sehingga Anda dapat menggunakan modul ini murni sebagai host untuk modul Add-on."
     },
     "reboot_modal": {
         "title": "Reboot Diperlukan",

@@ -1,6 +1,6 @@
 {
     "home_page": {
-        "title": "Encore Tweaks",
+        "title": "Zcore Tweaks",
         "status_card": {
             "running": "Працює ✨",
             "stopped": "Зупинено 💤",
@@ -10,7 +10,7 @@
             "loading_daemon": "Зачекайте…"
         },
         "info_card": {
-            "module": "Encore Tweaks",
+            "module": "Zcore Tweaks",
             "profile": "Поточний Профіль",
             "kernel": "Ядро",
             "chipset": "Чипсет",
@@ -18,11 +18,11 @@
         },
         "support_button": {
             "title": "Підтримати мене",
-            "description": "Encore Tweaks є і буде завжди безплатним, для вас та для всіх інших. Однак, якщо вам не байдуже, ви можете підтримати проєкт зробивши пожертвування."
+            "description": "Zcore Tweaks є і буде завжди безплатним, для вас та для всіх інших. Однак, якщо вам не байдуже, ви можете підтримати проєкт зробивши пожертвування."
         },
         "learn_encore": {
-            "title": "Вивчити Encore",
-            "description": "Навчіться як використовувати Encore Tweaks та його функції."
+            "title": "Вивчити Zcore",
+            "description": "Навчіться як використовувати Zcore Tweaks та його функції."
         }
     },
     "games_page": {
@@ -49,26 +49,26 @@
         },
         "device_mitigation": {
             "title": "Зменшення впливу на пристрій",
-            "description": "Зменшення впливу конкретних помилок пристрою через Encore Tweaks"
+            "description": "Зменшення впливу конкретних помилок пристрою через Zcore Tweaks"
         },
         "log_level": {
             "title": "Рівень журналювання",
-            "description": "Виберіть рівень деталізації робочого журналу Encore Tweaks"
+            "description": "Виберіть рівень деталізації робочого журналу Zcore Tweaks"
         },
         "save_log": {
             "title": "Зберегти журнал",
-            "description": "Експортувати робочий журнал Encore Tweaks",
+            "description": "Експортувати робочий журнал Zcore Tweaks",
             "exporting": "Пакування журналів, зачекайте…",
             "success": "Журнал успішно збережено",
             "failure": "Не вдалося зберегти журнал"
         },
         "create_shortcut": {
             "title": "Створити ярлик",
-            "description": "Створити ярлик на головному екрані, для швидкого доступу до Encore Tweaks"
+            "description": "Створити ярлик на головному екрані, для швидкого доступу до Zcore Tweaks"
         },
         "disable_tweaks": {
             "title": "Вимкнути Tweaks",
-            "description": "Вимкнути всі налаштування продуктивності, встановлені Encore Tweaks"
+            "description": "Вимкнути всі налаштування продуктивності, встановлені Zcore Tweaks"
         }
     },
     "game_settings": {
@@ -131,7 +131,7 @@
     "disable_tweaks": {
         "title": "Вимкнути Tweaks",
         "toggle_title": "Вимкнути Tweaks",
-        "brief": "Коли цей параметр увімкнено, він вимикає всі вбудовані оптимізації продуктивності в Encore Tweaks, дозволяючи використовувати цей модуль виключно як хост для модулів доповнення Encore."
+        "brief": "Коли цей параметр увімкнено, він вимикає всі вбудовані оптимізації продуктивності в Zcore Tweaks, дозволяючи використовувати цей модуль виключно як хост для модулів доповнення Zcore."
     },
     "reboot_modal": {
         "title": "Необхідне перезавантаження",

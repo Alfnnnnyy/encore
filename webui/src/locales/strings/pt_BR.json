@@ -17,12 +17,12 @@
             "daemonPID": "Daemon PID: {pid}"
         },
         "support_button": {
-            "description": "O Encore Tweaks é, e sempre será, gratuito para você e para todos. No entanto, você pode demonstrar seu apoio fazendo uma doação.",
+            "description": "O Zcore Tweaks é, e sempre será, gratuito para você e para todos. No entanto, você pode demonstrar seu apoio fazendo uma doação.",
             "title": "Apoie-me"
         },
         "learn_encore": {
-            "title": "Aprenda Encore",
-            "description": "Aprenda a usar o Encore Tweaks e suas funcionalidades."
+            "title": "Aprenda Zcore",
+            "description": "Aprenda a usar o Zcore Tweaks e suas funcionalidades."
         },
         "info_card": {
             "profile": "Perfil atual",
@@ -55,26 +55,26 @@
         },
         "device_mitigation": {
             "title": "Mitigação de Dispositivos",
-            "description": "Corrija problemas específicos do dispositivo no Encore Tweaks"
+            "description": "Corrija problemas específicos do dispositivo no Zcore Tweaks"
         },
         "log_level": {
             "title": "Nível de registro",
-            "description": "Escolha o nível de detalhamento do registro operacional do Encore Tweaks"
+            "description": "Escolha o nível de detalhamento do registro operacional do Zcore Tweaks"
         },
         "save_log": {
             "title": "Salvar Registros",
-            "description": "Exportar o registro operacional do Encore Tweaks",
+            "description": "Exportar o registro operacional do Zcore Tweaks",
             "exporting": "Empacotando logs, aguarde…",
             "success": "Log salvo com sucesso",
             "failure": "Falha ao salvar o log"
         },
         "create_shortcut": {
             "title": "Criar atalho",
-            "description": "Crie um atalho na tela inicial para acesso rápido ao Encore Tweaks"
+            "description": "Crie um atalho na tela inicial para acesso rápido ao Zcore Tweaks"
         },
         "disable_tweaks": {
             "title": "Desativar ajustes",
-            "description": "Desative todos os ajustes de desempenho definidos pelo Encore Tweaks"
+            "description": "Desative todos os ajustes de desempenho definidos pelo Zcore Tweaks"
         }
     },
     "game_settings": {
@@ -129,7 +129,7 @@
     "disable_tweaks": {
         "title": "Desativar ajustes",
         "toggle_title": "Desativar ajustes",
-        "brief": "Quando ativada, esta configuração desativa todas as otimizações de desempenho integradas do Encore Tweaks, permitindo que você utilize este módulo estritamente como um host para módulos Encore Addon."
+        "brief": "Quando ativada, esta configuração desativa todas as otimizações de desempenho integradas do Zcore Tweaks, permitindo que você utilize este módulo estritamente como um host para módulos Zcore Addon."
     },
     "reboot_modal": {
         "title": "Reinicialização necessária",

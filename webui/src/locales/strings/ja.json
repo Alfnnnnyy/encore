@@ -24,11 +24,11 @@
         },
         "support_button": {
             "title": "開発者を支援",
-            "description": "Encore Tweaksは、現在も、そしてこれからもずっと、あなたとすべての人にとって無料です。もしよろしければ、寄付を通じて開発を応援していただけると幸いです。"
+            "description": "Zcore Tweaksは、現在も、そしてこれからもずっと、あなたとすべての人にとって無料です。もしよろしければ、寄付を通じて開発を応援していただけると幸いです。"
         },
         "learn_encore": {
-            "title": "Encoreについて学ぶ",
-            "description": "Encore Tweaks の使い方と各機能について学びましょう。"
+            "title": "Zcoreについて学ぶ",
+            "description": "Zcore Tweaks の使い方と各機能について学びましょう。"
         }
     },
     "settings_page": {
@@ -43,14 +43,14 @@
         },
         "save_log": {
             "title": "ログを保存",
-            "description": "Encore Tweaks 操作ログをエクスポート",
+            "description": "Zcore Tweaks 操作ログをエクスポート",
             "exporting": "ログをパッケージ化しています。しばらくお待ちください…",
             "success": "ログの保存に成功しました",
             "failure": "ログの保存に失敗しました"
         },
         "create_shortcut": {
             "title": "ショートカット作成",
-            "description": "Encore Tweaks に素早くアクセスするためのホーム画面ショートカットを作成します"
+            "description": "Zcore Tweaks に素早くアクセスするためのホーム画面ショートカットを作成します"
         },
         "lite_mode": {
             "title": "ライトモードを強制",
@@ -58,15 +58,15 @@
         },
         "device_mitigation": {
             "title": "デバイスの緩和",
-            "description": "Encore Tweaksにおけるデバイス固有の問題を軽減する"
+            "description": "Zcore Tweaksにおけるデバイス固有の問題を軽減する"
         },
         "log_level": {
             "title": "ログレベル",
-            "description": "Encore Tweaks の操作ログの詳細度を選択します"
+            "description": "Zcore Tweaks の操作ログの詳細度を選択します"
         },
         "disable_tweaks": {
             "title": "調整を無効にする",
-            "description": "Encore Tweaksで設定されたすべてのパフォーマンス調整を無効にする"
+            "description": "Zcore Tweaksで設定されたすべてのパフォーマンス調整を無効にする"
         }
     },
     "game_settings": {
@@ -129,7 +129,7 @@
     "disable_tweaks": {
         "title": "調整を無効にする",
         "toggle_title": "調整を無効にする",
-        "brief": "有効にすると、Encore Tweaksに組み込まれたパフォーマンス最適化をすべてオフにし、このモジュールをEncore Addonモジュール専用のホストとして使用できるようになります。"
+        "brief": "有効にすると、Zcore Tweaksに組み込まれたパフォーマンス最適化をすべてオフにし、このモジュールをZcore Addonモジュール専用のホストとして使用できるようになります。"
     },
     "reboot_modal": {
         "title": "再起動が必要",

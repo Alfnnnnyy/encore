@@ -24,11 +24,11 @@
         },
         "support_button": {
             "title": "ادعمني",
-            "description": "Encore Tweaks لازال، و سيظل دائما مجاني لك و للجميع. رغم ذلك يمكنك إظهار بعض الدعم عن طريق التبرع."
+            "description": "Zcore Tweaks لازال، و سيظل دائما مجاني لك و للجميع. رغم ذلك يمكنك إظهار بعض الدعم عن طريق التبرع."
         },
         "learn_encore": {
-            "title": "تعرف على Encore",
-            "description": "تعلم كيف تستخدم Encore Tweaks و مميزاته."
+            "title": "تعرف على Zcore",
+            "description": "تعلم كيف تستخدم Zcore Tweaks و مميزاته."
         }
     },
     "games_page": {
@@ -55,26 +55,26 @@
         },
         "device_mitigation": {
             "title": "معالجة الجهاز",
-            "description": "معالجة بعض مشاكل الجهاز من طرف Encore Tweaks"
+            "description": "معالجة بعض مشاكل الجهاز من طرف Zcore Tweaks"
         },
         "log_level": {
             "title": "وضع السجل",
-            "description": "اختر مستوى تفصيل سجل عمليات Encore Tweaks"
+            "description": "اختر مستوى تفصيل سجل عمليات Zcore Tweaks"
         },
         "save_log": {
             "title": "حفظ السجل",
-            "description": "تصدير سجلات تشغيل Encore Tweaks",
+            "description": "تصدير سجلات تشغيل Zcore Tweaks",
             "exporting": "جاري حزم السجلات، يرجى الانتظار…",
             "success": "تم حفظ السجل بنجاح",
             "failure": "فشل حفظ السجل"
         },
         "create_shortcut": {
             "title": "إنشاء اختصار",
-            "description": "إنشاء اختصار على الشاشة الرئيسية للوصول السريع إلى Encore Tweaks"
+            "description": "إنشاء اختصار على الشاشة الرئيسية للوصول السريع إلى Zcore Tweaks"
         },
         "disable_tweaks": {
             "title": "تعطيل التعديلات",
-            "description": "تعطيل جميع تعديلات الأداء التي أجرتها أداة Encore Tweaks"
+            "description": "تعطيل جميع تعديلات الأداء التي أجرتها أداة Zcore Tweaks"
         }
     },
     "game_settings": {
@@ -129,7 +129,7 @@
     "disable_tweaks": {
         "title": "تعطيل التعديلات",
         "toggle_title": "تعطيل التعديلات",
-        "brief": "عند تفعيله ، هذا الإعداد يطفأ جميع تحسينات الأداء الموجودة مسبقًا على تعديلات Encore , متيحًا لك استخدام هذه الوحدة بصرامة كخادم لوحدات Encore المضافة."
+        "brief": "عند تفعيله ، هذا الإعداد يطفأ جميع تحسينات الأداء الموجودة مسبقًا على تعديلات Zcore , متيحًا لك استخدام هذه الوحدة بصرامة كخادم لوحدات Zcore المضافة."
     },
     "reboot_modal": {
         "title": "يجب إعادة التشغيل",

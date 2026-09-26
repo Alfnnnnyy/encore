@@ -1,6 +1,6 @@
 {
     "home_page": {
-        "title": "Encore Tweaks",
+        "title": "Zcore Tweaks",
         "status_card": {
             "running": "Working ✨",
             "stopped": "Stopped 💤",
@@ -10,7 +10,7 @@
             "loading_daemon": "One moment please…"
         },
         "info_card": {
-            "module": "Encore Tweaks",
+            "module": "Zcore Tweaks",
             "profile": "Current Profile",
             "kernel": "Kernel",
             "chipset": "Chipset",
@@ -18,11 +18,11 @@
         },
         "support_button": {
             "title": "Support Me",
-            "description": "Encore Tweaks is, and always will be, free for you, and everyone. You can however show me that you care by making a donation."
+            "description": "Zcore Tweaks is, and always will be, free for you, and everyone. You can however show me that you care by making a donation."
         },
         "learn_encore": {
-            "title": "Learn Encore",
-            "description": "Learn how to use Encore Tweaks and its features."
+            "title": "Learn Zcore",
+            "description": "Learn how to use Zcore Tweaks and its features."
         }
     },
     "games_page": {
@@ -49,26 +49,26 @@
         },
         "device_mitigation": {
             "title": "Device Mitigation",
-            "description": "Mitigate device specific issues on Encore Tweaks"
+            "description": "Mitigate device specific issues on Zcore Tweaks"
         },
         "log_level": {
             "title": "Log Level",
-            "description": "Choose how detailed the Encore Tweaks operational log should be"
+            "description": "Choose how detailed the Zcore Tweaks operational log should be"
         },
         "save_log": {
             "title": "Save Log",
-            "description": "Export Encore Tweaks operational log",
+            "description": "Export Zcore Tweaks operational log",
             "exporting": "Packing logs, please wait…",
             "success": "Log saved successfully",
             "failure": "Failed to save log"
         },
         "create_shortcut": {
             "title": "Create Shortcut",
-            "description": "Create a home screen shortcut for quick access to Encore Tweaks"
+            "description": "Create a home screen shortcut for quick access to Zcore Tweaks"
         },
         "disable_tweaks": {
             "title": "Disable Tweaks",
-            "description": "Disable all performance tweaks set by Encore Tweaks"
+            "description": "Disable all performance tweaks set by Zcore Tweaks"
         }
     },
     "game_settings": {
@@ -104,7 +104,7 @@
     "disable_tweaks": {
         "title": "Disable Tweaks",
         "toggle_title": "Disable Tweaks",
-        "brief": "When enabled, this setting turns off all built-in performance optimizations on Encore Tweaks, allowing you to use this module strictly as a host for Encore Addon modules."
+        "brief": "When enabled, this setting turns off all built-in performance optimizations on Zcore Tweaks, allowing you to use this module strictly as a host for Zcore Addon modules."
     },
     "device_mitigation": {
         "title": "Device Mitigation",

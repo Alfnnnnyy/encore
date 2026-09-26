@@ -37,8 +37,19 @@ wget -O module/banner.webp https://encore.rem01gaming.dev/ogp/default.webp
 find module/system/bin -maxdepth 1 -type f -name "*.sh" -exec sh -c 'mv -- "$0" "${0%.sh}"' {} \;
 
 # Parse version info to module prop
-zipName="encore-$version-$release_code.zip"
+zipName="zcore-$version-$release_code.zip"
 echo "zipName=$zipName" >>"$GITHUB_OUTPUT"
+echo "version=$version" >>"$GITHUB_OUTPUT"
+
+# Generate dynamic update.json
+cat <<EOF > "$GITHUB_WORKSPACE/update.json"
+{
+  "version": "$version",
+  "versionCode": $version_code,
+  "zipUrl": "https://github.com/Alfnnnnyy/encore/releases/download/$version/$zipName",
+  "changelog": "https://raw.githubusercontent.com/Alfnnnnyy/encore/main/changelog.md"
+}
+EOF
 
 # Generate sha256sum for integrity checkup
 bash .github/scripts/gen_sha256sum.sh "module"

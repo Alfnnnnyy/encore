@@ -115,7 +115,7 @@ export const useEncoreConfigStore = defineStore('encoreConfig', () => {
       currentProfile.value === 'balanced' ||
       (currentProfile.value === 'performance' && isLiteModeEnabled.value)
     ) {
-      exec(`/data/adb/modules/encore/system/bin/encore_utility change_cpu_gov ${governor}`).then(({ errno, stderr }) => {
+      exec(`[ -x /data/adb/modules/zcore/system/bin/encore_utility ] && /data/adb/modules/zcore/system/bin/encore_utility change_cpu_gov ${governor} || /data/adb/modules/encore/system/bin/encore_utility change_cpu_gov ${governor}`).then(({ errno, stderr }) => {
         if (errno !== 0) {
           console.error('[setBalanceGovernor] Failed to change CPU governor:', stderr)
         }
@@ -128,7 +128,7 @@ export const useEncoreConfigStore = defineStore('encoreConfig', () => {
     config.value.cpu_governor.powersave = governor
 
     if (currentProfile.value === 'powersave') {
-      exec(`/data/adb/modules/encore/system/bin/encore_utility change_cpu_gov ${governor}`).then(({ errno, stderr }) => {
+      exec(`[ -x /data/adb/modules/zcore/system/bin/encore_utility ] && /data/adb/modules/zcore/system/bin/encore_utility change_cpu_gov ${governor} || /data/adb/modules/encore/system/bin/encore_utility change_cpu_gov ${governor}`).then(({ errno, stderr }) => {
         if (errno !== 0) {
           console.error('[setPowersaveGovernor] Failed to change CPU governor:', stderr)
         }

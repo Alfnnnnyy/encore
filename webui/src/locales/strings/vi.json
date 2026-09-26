@@ -16,11 +16,11 @@
         },
         "support_button": {
             "title": "Ủng hộ tôi",
-            "description": "Encore Tweaks luôn và sẽ mãi miễn phí cho bạn cũng như tất cả mọi người. Tuy nhiên, bạn có thể bày tỏ sự ủng hộ của mình bằng cách quyên góp."
+            "description": "Zcore Tweaks luôn và sẽ mãi miễn phí cho bạn cũng như tất cả mọi người. Tuy nhiên, bạn có thể bày tỏ sự ủng hộ của mình bằng cách quyên góp."
         },
         "learn_encore": {
-            "title": "Tìm hiểu về Encore",
-            "description": "Tìm hiểu cách sử dụng Encore Tweaks và các tính năng của nó."
+            "title": "Tìm hiểu về Zcore",
+            "description": "Tìm hiểu cách sử dụng Zcore Tweaks và các tính năng của nó."
         }
     },
     "games_page": {
@@ -47,26 +47,26 @@
         },
         "device_mitigation": {
             "title": "Giảm thiểu thiết bị",
-            "description": "Giảm thiểu các vấn đề dành riêng cho thiết bị trên Encore Tweaks"
+            "description": "Giảm thiểu các vấn đề dành riêng cho thiết bị trên Zcore Tweaks"
         },
         "log_level": {
             "title": "Mức độ ghi nhật ký",
-            "description": "Chọn mức độ chi tiết cho nhật ký hoạt động của Encore Tweaks"
+            "description": "Chọn mức độ chi tiết cho nhật ký hoạt động của Zcore Tweaks"
         },
         "save_log": {
             "title": "Lưu nhật ký",
-            "description": "Xuất nhật ký hoạt động của Encore Tweaks",
+            "description": "Xuất nhật ký hoạt động của Zcore Tweaks",
             "exporting": "Đang đóng gói nhật ký, vui lòng chờ…",
             "success": "Đã lưu nhật ký thành công",
             "failure": "Không thể lưu nhật ký"
         },
         "create_shortcut": {
             "title": "Tạo lối tắt",
-            "description": "Tạo lối tắt trên màn hình chính để truy cập nhanh vào Encore Tweaks"
+            "description": "Tạo lối tắt trên màn hình chính để truy cập nhanh vào Zcore Tweaks"
         },
         "disable_tweaks": {
             "title": "Vô hiệu hóa các tinh chỉnh",
-            "description": "Vô hiệu hóa tất cả các tinh chỉnh hiệu năng do Encore Tweaks thiết lập"
+            "description": "Vô hiệu hóa tất cả các tinh chỉnh hiệu năng do Zcore Tweaks thiết lập"
         }
     },
     "game_settings": {
@@ -96,7 +96,7 @@
     "disable_tweaks": {
         "title": "Vô hiệu hóa các tinh chỉnh",
         "toggle_title": "Vô hiệu hóa các tinh chỉnh",
-        "brief": "Khi được kích hoạt, cài đặt này sẽ tắt tất cả các tính năng tối ưu hóa hiệu năng tích hợp sẵn của Encore Tweaks, cho phép bạn sử dụng mô-đun này thuần túy như một nền tảng để chạy các mô-đun Encore Addon."
+        "brief": "Khi được kích hoạt, cài đặt này sẽ tắt tất cả các tính năng tối ưu hóa hiệu năng tích hợp sẵn của Zcore Tweaks, cho phép bạn sử dụng mô-đun này thuần túy như một nền tảng để chạy các mô-đun Zcore Addon."
     },
     "device_mitigation": {
         "title": "Giảm thiểu thiết bị",

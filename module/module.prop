@@ -1,9 +1,9 @@
-id=encore
-name=Encore Tweaks
+id=zcore
+name=Zcore Tweaks
 version=
 versionCode=
-author=Rem01Gaming
-description=Special performance module for your Device.
-updateJson=https://encore.rem01gaming.dev/api/update.json
+author=Alfnnnnyy (based on Rem01Gaming)
+description=Specialized performance module with SuSFS kernel stealth cloaking, ZeroMount VFS optimization, and thermal engine profiles.
+updateJson=https://raw.githubusercontent.com/Alfnnnnyy/encore/main/update.json
 banner=banner.webp
 webuiIcon=webroot/icon.webp

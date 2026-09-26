@@ -16,7 +16,7 @@
 #
 
 MODDIR=${0%/*}
-MODULE_CONFIG="/data/adb/.config/encore"
+MODULE_CONFIG="/data/adb/.config/zcore"
 
 # === SUSFS Kernel Cloaking (Additive & Anti-Detection) ===
 SUSFS_BIN=""
@@ -40,7 +40,11 @@ if [ -n "$SUSFS_BIN" ]; then
         "$SUSFS_BIN" add_sus_path_loop "$MODULE_CONFIG" 2>/dev/null || "$SUSFS_BIN" add_sus_path "$MODULE_CONFIG" 2>/dev/null
     fi
     [ -f "/data/adb/service.d/.encore_cleanup.sh" ] && "$SUSFS_BIN" add_sus_path "/data/adb/service.d/.encore_cleanup.sh" 2>/dev/null
+    [ -f "/data/adb/service.d/.zcore_cleanup.sh" ] && "$SUSFS_BIN" add_sus_path "/data/adb/service.d/.zcore_cleanup.sh" 2>/dev/null
     [ -d "/data/encore" ] && "$SUSFS_BIN" add_sus_path_loop "/data/encore" 2>/dev/null
+    [ -d "/data/zcore" ] && "$SUSFS_BIN" add_sus_path_loop "/data/zcore" 2>/dev/null
+    [ -d "/data/adb/.config/encore" ] && "$SUSFS_BIN" add_sus_path_loop "/data/adb/.config/encore" 2>/dev/null
+    [ -d "/data/adb/modules/encore" ] && "$SUSFS_BIN" add_sus_path_loop "/data/adb/modules/encore" 2>/dev/null
 
     # 2. Memory Maps Masking (add_sus_map -> scrub from /proc/[pid]/maps, smaps)
     for _bin in "$MODDIR/system/bin/encored" \
@@ -78,6 +82,7 @@ else
     # Fallback for standard KernelSU/APatch mount
     if command -v ksud >/dev/null 2>&1; then
         ksud kernel umount add 'encore' 2>/dev/null || true
+        ksud kernel umount add 'zcore' 2>/dev/null || true
     fi
     [ -n "$SUSFS_BIN" ] && "$SUSFS_BIN" add_try_umount "$MODDIR" 2>/dev/null || true
 fi
