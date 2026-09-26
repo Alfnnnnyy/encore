@@ -15,6 +15,8 @@
 #
 
 MODDIR=$(dirname "$0")
+export PATH="$MODDIR/system/bin:/data/adb/ksu/bin:/data/adb/ap/bin:$PATH"
+
 MODULE_CONFIG="/data/adb/.config/encore"
 CLEANUP_SCRIPT="/data/adb/service.d/.encore_cleanup.sh"
 CPUFREQ="/sys/devices/system/cpu/cpu0/cpufreq"
@@ -93,7 +95,11 @@ for zone in /sys/class/thermal/thermal_zone*/mode; do
 	echo "disabled" > "$zone" 2>/dev/null || true
 done
 
-# SUSFS late cloaking check
+# ZeroMount & SUSFS cloaking check
+if [ ! -e "/dev/zeromount" ] && command -v ksud >/dev/null 2>&1; then
+	ksud kernel umount add 'encore' 2>/dev/null || true
+fi
+
 for _sus in /data/adb/ksu/bin/ksu_susfs /system/bin/susfs /data/adb/bin/ksu_susfs /data/adb/ap/bin/ksu_susfs; do
 	if [ -x "$_sus" ]; then
 		"$_sus" add_sus_path_loop "$MODULE_CONFIG" 2>/dev/null || "$_sus" add_sus_path "$MODULE_CONFIG" 2>/dev/null
@@ -101,9 +107,10 @@ for _sus in /data/adb/ksu/bin/ksu_susfs /system/bin/susfs /data/adb/bin/ksu_susf
 		break
 	fi
 done
-if command -v ksud >/dev/null 2>&1; then
-	ksud kernel umount add 'encore' 2>/dev/null
-fi
 
-# Start Encore Daemon
-encored daemon
+# Start Encore Daemon using absolute path
+if [ -x "$MODDIR/system/bin/encored" ]; then
+	"$MODDIR/system/bin/encored" daemon &
+else
+	encored daemon &
+fi

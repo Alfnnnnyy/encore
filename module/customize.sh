@@ -176,9 +176,7 @@ touch "$MODPATH/skip_mountify"
 if [ "$KSU" = "true" ] || [ "$APATCH" = "true" ]; then
   ui_print "- KSU/AP Detected, skipping module mount (skip_mount)"
 	rm "$MODPATH/action.sh"
-	if [ ! -d "$MODPATH/odm" ]; then
-		touch "$MODPATH/skip_mount"
-	fi
+	touch "$MODPATH/skip_mount"
 
 	# symlink ourselves on $PATH
 	manager_paths="/data/adb/ap/bin /data/adb/ksu/bin"
@@ -196,17 +194,6 @@ fi
 # Extract webroot
 ui_print "- Extracting webroot"
 unzip -o "$ZIPFILE" "webroot/*" -d "$MODPATH" -x "*.sha256" >&2
-
-# Extract thermal configurations if present
-if unzip -l "$ZIPFILE" 2>/dev/null | grep -q "odm/"; then
-	ui_print "- Extracting optimized thermal engine profiles"
-	unzip -o "$ZIPFILE" "odm/*" -d "$MODPATH" -x "*.sha256" >&2
-	set_perm_recursive "$MODPATH/odm" 0 0 0755 0644
-fi
-if unzip -l "$ZIPFILE" 2>/dev/null | grep -q "system/vendor/"; then
-	unzip -o "$ZIPFILE" "system/vendor/*" -d "$MODPATH/system" -x "*.sha256" >&2
-	set_perm_recursive "$MODPATH/system/vendor" 0 0 0755 0644
-fi
 
 # Mitigate root detection
 [ -d /data/encore ] && rm -rf /data/encore

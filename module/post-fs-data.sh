@@ -48,7 +48,14 @@ if [ -n "$SUSFS_BIN" ]; then
     [ -f "$MODDIR/system/bin/encore_utility" ] && "$SUSFS_BIN" add_sus_map "$MODDIR/system/bin/encore_utility" 2>/dev/null
 fi
 
-# 3. KernelSU / APatch mount namespace unmount for isolated processes
-if command -v ksud >/dev/null 2>&1; then
-    ksud kernel umount add 'encore' 2>/dev/null
+# 3. ZeroMount & Mount Isolation Handling
+if [ -e "/dev/zeromount" ]; then
+    # ZeroMount VFS active - Zero mount points created
+    :
+else
+    # Fallback for standard KernelSU/APatch mount
+    if command -v ksud >/dev/null 2>&1; then
+        ksud kernel umount add 'encore' 2>/dev/null || true
+    fi
+    [ -n "$SUSFS_BIN" ] && "$SUSFS_BIN" add_try_umount "$MODDIR" 2>/dev/null || true
 fi
