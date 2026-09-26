@@ -1,3 +1,17 @@
+## Zcore Tweaks 5.4.3
+
+**Thanks for using Zcore Tweaks!**
+
+Your continued support keeps this project going.
+
+### Changelog
+
+- Automate GitHub Release creation and asset upload directly in GitHub Actions CI/CD workflow
+- Flashable zip packages are now automatically attached to GitHub Releases on every build
+- Dynamic update.json and release assets are always in sync
+
+---
+
 ## Zcore Tweaks 5.4.2
 
 **Thanks for using Zcore Tweaks!**

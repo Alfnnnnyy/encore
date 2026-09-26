@@ -73,6 +73,19 @@ jobs:
           name: zcore-build
           path: ${{ steps.compileZip.outputs.zipName }}
 
+      - name: Publish to GitHub Release
+        if: github.event_name != 'pull_request'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="${{ steps.compileZip.outputs.version }}"
+          ZIP_NAME="${{ steps.compileZip.outputs.zipName }}"
+          if ! gh release view "$VERSION" >/dev/null 2>&1; then
+            gh release create "$VERSION" "$ZIP_NAME" --title "Zcore Tweaks $VERSION" --notes-file changelog.md
+          else
+            gh release upload "$VERSION" "$ZIP_NAME" --clobber
+          fi
+
       - name: Upload To Telegram
         if: github.event_name != 'pull_request' && env.CHAT_ID != '' && env.BOT_TOKEN != ''
         env:
