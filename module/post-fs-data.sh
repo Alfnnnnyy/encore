@@ -34,18 +34,40 @@ elif [ -z "$SUSFS_BIN" ] && command -v susfs >/dev/null 2>&1; then
 fi
 
 if [ -n "$SUSFS_BIN" ]; then
-    # 1. Hide active module directory and all recursive sub-paths from VFS lookups
+    # 1. VFS Path Cloaking (add_sus_path & add_sus_path_loop -> return ENOENT)
     "$SUSFS_BIN" add_sus_path_loop "$MODDIR" 2>/dev/null || "$SUSFS_BIN" add_sus_path "$MODDIR" 2>/dev/null
-    
-    # Hide module config directory
     if [ -d "$MODULE_CONFIG" ]; then
         "$SUSFS_BIN" add_sus_path_loop "$MODULE_CONFIG" 2>/dev/null || "$SUSFS_BIN" add_sus_path "$MODULE_CONFIG" 2>/dev/null
     fi
+    [ -f "/data/adb/service.d/.encore_cleanup.sh" ] && "$SUSFS_BIN" add_sus_path "/data/adb/service.d/.encore_cleanup.sh" 2>/dev/null
+    [ -d "/data/encore" ] && "$SUSFS_BIN" add_sus_path_loop "/data/encore" 2>/dev/null
 
-    # 2. Hide mapped binary execution memory pages (proc/pid/maps, smaps)
-    [ -f "$MODDIR/system/bin/encored" ] && "$SUSFS_BIN" add_sus_map "$MODDIR/system/bin/encored" 2>/dev/null
-    [ -f "$MODDIR/system/bin/encore_profiler" ] && "$SUSFS_BIN" add_sus_map "$MODDIR/system/bin/encore_profiler" 2>/dev/null
-    [ -f "$MODDIR/system/bin/encore_utility" ] && "$SUSFS_BIN" add_sus_map "$MODDIR/system/bin/encore_utility" 2>/dev/null
+    # 2. Memory Maps Masking (add_sus_map -> scrub from /proc/[pid]/maps, smaps)
+    for _bin in "$MODDIR/system/bin/encored" \
+                "$MODDIR/system/bin/encore_profiler" \
+                "$MODDIR/system/bin/encore_utility" \
+                "/data/adb/ksu/bin/encored" \
+                "/data/adb/ksu/bin/encore_profiler" \
+                "/data/adb/ksu/bin/encore_utility" \
+                "/data/adb/ap/bin/encored" \
+                "/data/adb/ap/bin/encore_profiler" \
+                "/data/adb/ap/bin/encore_utility"; do
+        [ -e "$_bin" ] && "$SUSFS_BIN" add_sus_map "$_bin" 2>/dev/null
+    done
+
+    # 3. Mount Table Filtering (hide_sus_mnts & add_sus_mount)
+    "$SUSFS_BIN" add_sus_mount "$MODDIR" 2>/dev/null
+    "$SUSFS_BIN" add_try_umount "$MODDIR" 2>/dev/null
+    "$SUSFS_BIN" hide_sus_mnts_for_non_su_procs 1 2>/dev/null
+
+    # 4. Kernel Log & AVC Audit Spoofing
+    "$SUSFS_BIN" enable_log 0 2>/dev/null
+    "$SUSFS_BIN" enable_avc_log_spoofing 1 2>/dev/null
+
+    # 5. Kstat Inode Spoofing (clone genuine system inode metadata)
+    for _f in "$MODDIR/system/bin/"*; do
+        [ -f "$_f" ] && "$SUSFS_BIN" update_sus_kstat_full_clone "$_f" 2>/dev/null
+    done
 fi
 
 # 3. ZeroMount & Mount Isolation Handling
