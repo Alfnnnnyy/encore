@@ -69,8 +69,6 @@ void set_profiler_env_vars() {
 static void sync_profile_state(EncoreProfileMode mode, const std::string &info_content) {
     write2file(GAME_INFO, info_content);
     write2file(PROFILE_MODE, static_cast<int>(mode), "\n");
-    write2file(LEGACY_CONFIG_DIR "/gameinfo", info_content);
-    write2file(LEGACY_CONFIG_DIR "/current_profile", static_cast<int>(mode), "\n");
 }
 
 void run_perfcommon(void) {
@@ -83,7 +81,7 @@ void run_perfcommon(void) {
 
     set_profiler_env_vars();
 
-    if (system("encore_profiler perfcommon")) {
+    if (system("zcore_profiler perfcommon") != 0 && system("encore_profiler perfcommon") != 0) {
         LOGE("Unable to execute profiler changes to perfcommon");
     }
 }
@@ -100,13 +98,13 @@ void apply_performance_profile(bool lite_mode, std::string game_pkg, pid_t game_
 
     if (lite_mode) {
         LOGD("Lite mode is enabled");
-        if (system("encore_profiler performance_lite") != 0) {
+        if (system("zcore_profiler performance_lite") != 0 && system("encore_profiler performance_lite") != 0) {
             LOGE("Unable to execute profiler changes to performance_lite");
         }
         return;
     }
 
-    if (system("encore_profiler performance") != 0) {
+    if (system("zcore_profiler performance") != 0 && system("encore_profiler performance") != 0) {
         LOGE("Unable to execute profiler changes to performance");
     }
 }
@@ -121,7 +119,7 @@ void apply_balance_profile() {
 
     set_profiler_env_vars();
 
-    if (system("encore_profiler balance") != 0) {
+    if (system("zcore_profiler balance") != 0 && system("encore_profiler balance") != 0) {
         LOGE("Unable to execute profiler changes to balance");
     }
 }
@@ -136,7 +134,7 @@ void apply_powersave_profile() {
 
     set_profiler_env_vars();
 
-    if (system("encore_profiler powersave") != 0) {
+    if (system("zcore_profiler powersave") != 0 && system("encore_profiler powersave") != 0) {
         LOGE("Unable to execute profiler changes to powersave");
     }
 }

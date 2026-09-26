@@ -18,10 +18,14 @@ MODDIR=$(dirname "$0")
 export PATH="$MODDIR/system/bin:/data/adb/ksu/bin:/data/adb/ap/bin:$PATH"
 
 MODULE_CONFIG="/data/adb/.config/zcore"
-CLEANUP_SCRIPT="/data/adb/service.d/.zcore_cleanup.sh"
-if [ -d "/data/adb/.config/encore" ] && [ ! -d "$MODULE_CONFIG" ]; then
-	cp -r /data/adb/.config/encore "$MODULE_CONFIG"
+mkdir -p "$MODULE_CONFIG"
+if [ -d "/data/adb/.config/encore" ] && [ ! -L "/data/adb/.config/encore" ]; then
+	cp -r /data/adb/.config/encore/* "$MODULE_CONFIG/" 2>/dev/null || true
 fi
+[ ! -e "/data/adb/.config/encore" ] && ln -sf "$MODULE_CONFIG" "/data/adb/.config/encore" 2>/dev/null
+[ ! -e "/data/adb/modules/encore" ] && ln -sf "$MODDIR" "/data/adb/modules/encore" 2>/dev/null
+
+CLEANUP_SCRIPT="/data/adb/service.d/.zcore_cleanup.sh"
 CPUFREQ="/sys/devices/system/cpu/cpu0/cpufreq"
 
 # Restore original module.prop
@@ -117,9 +121,9 @@ fi
 for _sus in /data/adb/ksu/bin/ksu_susfs /system/bin/susfs /data/adb/bin/ksu_susfs /data/adb/ap/bin/ksu_susfs; do
 	if [ -x "$_sus" ]; then
 		[ -d "$MODULE_CONFIG" ] && { "$_sus" add_sus_path_loop "$MODULE_CONFIG" 2>/dev/null || "$_sus" add_sus_path "$MODULE_CONFIG" 2>/dev/null; }
-		[ -f "$MODDIR/system/bin/encored" ] && "$_sus" add_sus_map "$MODDIR/system/bin/encored" 2>/dev/null
-		[ -f "$MODDIR/system/bin/encore_profiler" ] && "$_sus" add_sus_map "$MODDIR/system/bin/encore_profiler" 2>/dev/null
-		[ -f "$MODDIR/system/bin/encore_utility" ] && "$_sus" add_sus_map "$MODDIR/system/bin/encore_utility" 2>/dev/null
+		for _b in zcored zcore_profiler zcore_utility encored encore_profiler encore_utility; do
+			[ -f "$MODDIR/system/bin/$_b" ] && "$_sus" add_sus_map "$MODDIR/system/bin/$_b" 2>/dev/null
+		done
 		"$_sus" "$_OP_SUS_MNT" "$MODDIR" 2>/dev/null
 		"$_sus" hide_sus_mnts_for_non_su_procs 1 2>/dev/null
 		"$_sus" enable_log 0 2>/dev/null
@@ -128,9 +132,13 @@ for _sus in /data/adb/ksu/bin/ksu_susfs /system/bin/susfs /data/adb/bin/ksu_susf
 	fi
 done
 
-# Start Encore Daemon using absolute path
-if [ -x "$MODDIR/system/bin/encored" ]; then
+# Start Zcore Daemon using absolute path
+if [ -x "$MODDIR/system/bin/zcored" ]; then
+	"$MODDIR/system/bin/zcored" daemon &
+elif [ -x "$MODDIR/system/bin/encored" ]; then
 	"$MODDIR/system/bin/encored" daemon &
+elif command -v zcored >/dev/null 2>&1; then
+	zcored daemon &
 else
 	encored daemon &
 fi

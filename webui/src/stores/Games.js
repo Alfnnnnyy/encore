@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import * as KernelSU from '@/helpers/KernelSU'
+import { exec } from 'kernelsu'
 
 export const useGamesStore = defineStore('games', () => {
   const userApps = ref([])
@@ -83,6 +84,7 @@ export const useGamesStore = defineStore('games', () => {
     try {
       const configString = JSON.stringify(gamelistConfig.value, null, 2)
       await KernelSU.writeFile(activeConfigPath, configString)
+      await exec(`[ -d /data/adb/.config/encore ] && cp -f "${activeConfigPath}" /data/adb/.config/encore/gamelist.json 2>/dev/null; [ -d /data/adb/.config/zcore ] && cp -f "${activeConfigPath}" /data/adb/.config/zcore/gamelist.json 2>/dev/null`).catch(() => {})
       console.log('Gamelist config saved successfully')
       return true
     } catch (e) {

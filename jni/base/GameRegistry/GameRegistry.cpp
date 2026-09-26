@@ -160,6 +160,9 @@ bool GameRegistry::populate_from_base(const std::string &gamelist, const std::st
     writer.SetIndent(' ', 2);
     doc.Accept(writer);
 
+    try {
+        fs::create_directories(fs::path(gamelist).parent_path());
+    } catch (...) {}
     std::ofstream output_file(gamelist);
     if (!output_file.is_open()) {
         LOGE_TAG("GameRegistry", "Failed to create gamelist: {}", gamelist);

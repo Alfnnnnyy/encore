@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2024-2026 Rem01Gaming
+ * Copyright (C) 2026 Alfnnnnyy (Zcore Tweaks)
+ * Copyright (C) 2024-2026 Rem01Gaming (Encore Tweaks)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +30,7 @@
 
 #define LOCK_FILE CONFIG_DIR "/.lock"
 #define JAVA_LOCK_FILE CONFIG_DIR "/java.lock"
-#define LOG_FILE CONFIG_DIR "/encore.log"
+#define LOG_FILE CONFIG_DIR "/zcore.log"
 #define PROFILE_MODE CONFIG_DIR "/current_profile"
 #define GAME_INFO CONFIG_DIR "/gameinfo"
 #define CONFIG_FILE CONFIG_DIR "/config.json"

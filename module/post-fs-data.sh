@@ -47,16 +47,10 @@ if [ -n "$SUSFS_BIN" ]; then
     [ -d "/data/adb/modules/encore" ] && "$SUSFS_BIN" add_sus_path_loop "/data/adb/modules/encore" 2>/dev/null
 
     # 2. Memory Maps Masking (add_sus_map -> scrub from /proc/[pid]/maps, smaps)
-    for _bin in "$MODDIR/system/bin/encored" \
-                "$MODDIR/system/bin/encore_profiler" \
-                "$MODDIR/system/bin/encore_utility" \
-                "/data/adb/ksu/bin/encored" \
-                "/data/adb/ksu/bin/encore_profiler" \
-                "/data/adb/ksu/bin/encore_utility" \
-                "/data/adb/ap/bin/encored" \
-                "/data/adb/ap/bin/encore_profiler" \
-                "/data/adb/ap/bin/encore_utility"; do
-        [ -e "$_bin" ] && "$SUSFS_BIN" add_sus_map "$_bin" 2>/dev/null
+    for _name in zcored zcore_profiler zcore_utility encored encore_profiler encore_utility; do
+        [ -e "$MODDIR/system/bin/$_name" ] && "$SUSFS_BIN" add_sus_map "$MODDIR/system/bin/$_name" 2>/dev/null
+        [ -e "/data/adb/ksu/bin/$_name" ] && "$SUSFS_BIN" add_sus_map "/data/adb/ksu/bin/$_name" 2>/dev/null
+        [ -e "/data/adb/ap/bin/$_name" ] && "$SUSFS_BIN" add_sus_map "/data/adb/ap/bin/$_name" 2>/dev/null
     done
 
     # 3. Mount Table Filtering (hide_sus_mnts & add_sus_mount)

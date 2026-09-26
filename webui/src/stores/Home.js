@@ -95,10 +95,18 @@ export const useHomeStore = defineStore('home', () => {
         throw new Error('Not running on KSU WebUI')
       }
 
-      const { errno, stdout } = await exec('/system/bin/toybox pidof encored')
-      const pid = stdout.trim()
+      let pid = ''
+      let res = await exec('/system/bin/toybox pidof zcored')
+      if (res.errno === 0 && res.stdout.trim()) {
+        pid = res.stdout.trim().split(' ')[0]
+      } else {
+        res = await exec('/system/bin/toybox pidof encored')
+        if (res.errno === 0 && res.stdout.trim()) {
+          pid = res.stdout.trim().split(' ')[0]
+        }
+      }
 
-      if (errno === 0 && pid) {
+      if (pid) {
         daemonPidRaw.value = pid
         daemonStatusRaw.value = 'running'
         daemonError.value = ''

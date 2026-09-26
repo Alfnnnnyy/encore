@@ -163,12 +163,12 @@ logcat() {
 
 	# Header
 	echo -e "\e[1;36m┌────────────────────────────────────────────┐"
-	echo -e "│          \e[1;37mEncore Tweaks Log Viewer\e[1;36m          │"
+	echo -e "│          \e[1;37mZcore Tweaks Log Viewer\e[1;36m           │"
 	echo -e "└────────────────────────────────────────────┘\e[0m"
 
 	# Info block
 	echo -e "
-\e[1;32mModule Version:\e[0m $(awk -F'=' '/version=/ {print $2}' /data/adb/modules/encore/module.prop)
+\e[1;32mModule Version:\e[0m $([ -f /data/adb/modules/zcore/module.prop ] && awk -F'=' '/version=/ {print $2}' /data/adb/modules/zcore/module.prop || awk -F'=' '/version=/ {print $2}' /data/adb/modules/encore/module.prop 2>/dev/null)
 \e[1;32mChipset:\e[0m        $SOC $(getprop ro.board.platform)
 \e[1;32mFingerprint:\e[0m    $(getprop ro.build.fingerprint)
 \e[1;32mAndroid SDK:\e[0m    $(getprop ro.build.version.sdk)
@@ -178,7 +178,9 @@ logcat() {
 "
 
 	# Tail log
-	tail -f $MODULE_CONFIG/encore.log | while read -r line; do
+	target_log="$MODULE_CONFIG/zcore.log"
+	[ ! -f "$target_log" ] && target_log="$MODULE_CONFIG/encore.log"
+	tail -f "$target_log" | while read -r line; do
 		timestamp="${line:0:23}"
 		level_char=$(echo "$line" | awk '{print $3}')
 		msg="${line:24}"

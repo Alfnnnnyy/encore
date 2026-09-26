@@ -18,7 +18,7 @@
 SKIPUNZIP=1
 SOC=0
 
-MODULE_CONFIG="/data/adb/.config/zcore"
+MODULE_CONFIG="/data/adb/.config/encore"
 
 make_node() {
 	[ ! -f "$2" ] && echo "$1" >"$2"
@@ -130,7 +130,8 @@ generate_gamelist() {
   make_dir "$MODULE_CONFIG"
   make_dir "/data/adb/.config/encore"
   extract "$ZIPFILE" 'gamelist.txt' "$TMPDIR"
-  "$MODPATH/system/bin/encored" setup_gamelist "$TMPDIR/gamelist.txt"
+  [ -x "$MODPATH/system/bin/zcored" ] && BIN_CMD="$MODPATH/system/bin/zcored" || BIN_CMD="$MODPATH/system/bin/encored"
+  "$BIN_CMD" setup_gamelist "$TMPDIR/gamelist.txt"
   exit_code=$?
 
   # Sync generated gamelist.json across both directories
@@ -163,8 +164,11 @@ extract "$ZIPFILE" 'uninstall.sh' "$MODPATH"
 extract "$ZIPFILE" 'action.sh' "$MODPATH"
 extract "$ZIPFILE" 'cleanup.sh' "$MODPATH"
 extract "$ZIPFILE" 'binder_resolver.apk' "$MODPATH"
-extract "$ZIPFILE" 'system/bin/encore_profiler' "$MODPATH"
-extract "$ZIPFILE" 'system/bin/encore_utility' "$MODPATH"
+for script in zcore_profiler zcore_utility encore_profiler encore_utility; do
+	if unzip -l "$ZIPFILE" 2>/dev/null | grep -q "system/bin/$script"; then
+		extract "$ZIPFILE" "system/bin/$script" "$MODPATH"
+	fi
+done
 cp "$MODPATH/module.prop" "$MODPATH/module.prop.orig"
 
 # Target architecture
@@ -175,9 +179,22 @@ case $ARCH in
 esac
 
 # Extract executables
-extract "$ZIPFILE" "libs/$ARCH_TMP/encored" "$TMPDIR"
-cp "$TMPDIR"/libs/"$ARCH_TMP"/* "$MODPATH/system/bin"
+if unzip -l "$ZIPFILE" 2>/dev/null | grep -q "libs/$ARCH_TMP/zcored"; then
+	extract "$ZIPFILE" "libs/$ARCH_TMP/zcored" "$TMPDIR"
+	cp "$TMPDIR"/libs/"$ARCH_TMP"/* "$MODPATH/system/bin"
+	ln -sf "$MODPATH/system/bin/zcored" "$MODPATH/system/bin/encored"
+elif unzip -l "$ZIPFILE" 2>/dev/null | grep -q "libs/$ARCH_TMP/encored"; then
+	extract "$ZIPFILE" "libs/$ARCH_TMP/encored" "$TMPDIR"
+	cp "$TMPDIR"/libs/"$ARCH_TMP"/* "$MODPATH/system/bin"
+	ln -sf "$MODPATH/system/bin/encored" "$MODPATH/system/bin/zcored"
+fi
 rm -rf "$TMPDIR/libs"
+
+# Ensure mutual symlinks inside system/bin
+[ -e "$MODPATH/system/bin/zcore_profiler" ] && [ ! -e "$MODPATH/system/bin/encore_profiler" ] && ln -sf "$MODPATH/system/bin/zcore_profiler" "$MODPATH/system/bin/encore_profiler"
+[ -e "$MODPATH/system/bin/encore_profiler" ] && [ ! -e "$MODPATH/system/bin/zcore_profiler" ] && ln -sf "$MODPATH/system/bin/encore_profiler" "$MODPATH/system/bin/zcore_profiler"
+[ -e "$MODPATH/system/bin/zcore_utility" ] && [ ! -e "$MODPATH/system/bin/encore_utility" ] && ln -sf "$MODPATH/system/bin/zcore_utility" "$MODPATH/system/bin/encore_utility"
+[ -e "$MODPATH/system/bin/encore_utility" ] && [ ! -e "$MODPATH/system/bin/zcore_utility" ] && ln -sf "$MODPATH/system/bin/encore_utility" "$MODPATH/system/bin/zcore_utility"
 
 # For KSU / APatch standalone WebUI
 if [ "$KSU" = "true" ] || [ "$APATCH" = "true" ]; then
@@ -190,9 +207,9 @@ BIN_PATH="$MODPATH/system/bin"
 for dir in $manager_paths; do
 	[ -d "$dir" ] && {
 		ui_print "- Creating symlink in $dir"
-		ln -sf "$BIN_PATH/encored" "$dir/encored"
-		ln -sf "$BIN_PATH/encore_profiler" "$dir/encore_profiler"
-		ln -sf "$BIN_PATH/encore_utility" "$dir/encore_utility"
+		for b in zcored zcore_profiler zcore_utility encored encore_profiler encore_utility; do
+			[ -e "$BIN_PATH/$b" ] && ln -sf "$BIN_PATH/$b" "$dir/$b"
+		done
 	}
 done
 
@@ -229,23 +246,36 @@ ui_print "- Permission setup"
 set_perm_recursive "$MODPATH/system/bin" 0 0 0755 0755
 set_perm "$MODPATH/post-fs-data.sh" 0 0 0755 2>/dev/null
 
-# Sync config files across both directory paths for complete binary compatibility
-make_dir "/data/adb/.config/encore"
-cp -rf "$MODULE_CONFIG/"* "/data/adb/.config/encore/" 2>/dev/null || true
+# Create symlinks so both encore and zcore paths resolve to the same location
+make_dir "$MODULE_CONFIG"
+make_dir "/data/adb/.config/zcore"
+[ ! -L "/data/adb/.config/zcore" ] && ln -sf "/data/adb/.config/encore" "/data/adb/.config/zcore" 2>/dev/null || true
+[ ! -L "/data/adb/modules/encore" ] && ln -sf "$MODPATH" "/data/adb/modules/encore" 2>/dev/null || true
 
 # Gamelist setup
+need_generate=0
 if [ ! -f "$MODULE_CONFIG/gamelist.json" ] && [ ! -f "/data/adb/.config/encore/gamelist.json" ]; then
-  ui_print "- Initializing Gamelist JSON..."
+  need_generate=1
+else
+  # Check if existing gamelist.json is empty "{}" or blank
+  _raw=$(tr -d ' \n\r\t' < "$MODULE_CONFIG/gamelist.json" 2>/dev/null)
+  [ -z "$_raw" ] && _raw=$(tr -d ' \n\r\t' < "/data/adb/.config/encore/gamelist.json" 2>/dev/null)
+  if [ "$_raw" = "{}" ] || [ -z "$_raw" ]; then
+    ui_print "- Empty gamelist detected, auto-populating installed games..."
+    need_generate=1
+  fi
+fi
+
+if [ $need_generate -eq 1 ]; then
+  ui_print "- Generating Gamelist JSON from recommended games..."
   generate_gamelist
 else
+  ui_print "- Preserving existing user game configurations..."
   [ -f "/data/adb/.config/encore/gamelist.json" ] && [ ! -f "$MODULE_CONFIG/gamelist.json" ] && cp -f "/data/adb/.config/encore/gamelist.json" "$MODULE_CONFIG/gamelist.json"
   [ -f "$MODULE_CONFIG/gamelist.json" ] && [ ! -f "/data/adb/.config/encore/gamelist.json" ] && cp -f "$MODULE_CONFIG/gamelist.json" "/data/adb/.config/encore/gamelist.json"
 
-  "$MODPATH/system/bin/encored" check_gamelist 2>/dev/null
-  if [ $? -gt 0 ] && [ ! -f "$MODULE_CONFIG/gamelist.json" ]; then
-    ui_print "! Gamelist JSON is malformed, regenerating..."
-    generate_gamelist
-  fi
+  [ -x "$MODPATH/system/bin/zcored" ] && BIN_CMD="$MODPATH/system/bin/zcored" || BIN_CMD="$MODPATH/system/bin/encored"
+  "$BIN_CMD" check_gamelist 2>/dev/null
 fi
 
 # SOC CODE:

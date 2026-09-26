@@ -122,7 +122,8 @@ static void clear_dnd_if_needed(DaemonState &state) {
         set_do_not_disturb(state.prev_dnd_state);
         state.game_requested_dnd = false;
     }
-    system("encore_utility set_bypass_charging 0");
+    if (system("zcore_utility set_bypass_charging 0") != 0)
+        system("encore_utility set_bypass_charging 0");
 }
 
 [[nodiscard]] static bool apply_game_profile(DaemonState &state) {
@@ -161,9 +162,11 @@ static void clear_dnd_if_needed(DaemonState &state) {
     }
 
     if (active_game->enable_bypass_charging) {
-        system("encore_utility set_bypass_charging 1");
+        if (system("zcore_utility set_bypass_charging 1") != 0)
+            system("encore_utility set_bypass_charging 1");
     } else {
-        system("encore_utility set_bypass_charging 0");
+        if (system("zcore_utility set_bypass_charging 0") != 0)
+            system("encore_utility set_bypass_charging 0");
     }
     return true;
 }
