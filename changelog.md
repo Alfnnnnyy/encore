@@ -1,4 +1,4 @@
-## Zcore Tweaks 5.4.9
+## Zcore Tweaks 5.5.0
 
 **Thanks for using Zcore Tweaks!**
 
@@ -6,7 +6,6 @@ Your continued support keeps this project going.
 
 ### Changelog
 
-- Overhaul Bypass Charging into Smart Float Charging mode (eliminates battery drain and tekor)
-- Keep wall adapter input unthrottled (level 0) so motherboard and SoC are powered fully from cable
-- Throttle battery charge current to 1.2A to eliminate charging heat without causing battery drop
-- Prevent PMIC freeze by removing unnecessary input_suspend manipulation
+- Fix bypass charging deactivation: explicitly restore unthrottled charging when games with bypass disabled enter foreground
+- Cleanly manage active_game_bypass lockfile during game lifecycle transitions
+- Ensure normal 4.25A fast charging is actively enforced when bypass charging toggle is turned off

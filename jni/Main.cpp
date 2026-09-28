@@ -39,6 +39,7 @@
 #include <ModuleProperty.hpp>
 #include <ShellUtility.hpp>
 #include <SignalHandler.hpp>
+#include <Write2File.hpp>
 
 namespace fs = std::filesystem;
 
@@ -122,6 +123,7 @@ static void clear_dnd_if_needed(DaemonState &state) {
         set_do_not_disturb(state.prev_dnd_state);
         state.game_requested_dnd = false;
     }
+    unlink((std::string(CONFIG_DIR) + "/active_game_bypass").c_str());
     if (system("zcore_utility set_bypass_charging 0") != 0)
         system("encore_utility set_bypass_charging 0");
 }
@@ -150,6 +152,16 @@ static void clear_dnd_if_needed(DaemonState &state) {
     state.cur_mode = PERFORMANCE_PROFILE;
     LOGI("Applying performance profile for {} (PID: {})", state.active_package, state.active_game_pid);
 
+    if (active_game->enable_bypass_charging) {
+        write2file(std::string(CONFIG_DIR) + "/active_game_bypass", "1\n");
+        if (system("zcore_utility set_bypass_charging 1") != 0)
+            system("encore_utility set_bypass_charging 1");
+    } else {
+        unlink((std::string(CONFIG_DIR) + "/active_game_bypass").c_str());
+        if (system("zcore_utility set_bypass_charging 0") != 0)
+            system("encore_utility set_bypass_charging 0");
+    }
+
     const bool lite_mode = active_game->lite_mode || config_store.get_preferences().enforce_lite_mode;
     apply_performance_profile(lite_mode, state.active_package, state.active_game_pid, state.active_game_uid);
 
@@ -159,14 +171,6 @@ static void clear_dnd_if_needed(DaemonState &state) {
     } else {
         state.game_requested_dnd = false;
         set_do_not_disturb(state.prev_dnd_state);
-    }
-
-    if (active_game->enable_bypass_charging) {
-        if (system("zcore_utility set_bypass_charging 1") != 0)
-            system("encore_utility set_bypass_charging 1");
-    } else {
-        if (system("zcore_utility set_bypass_charging 0") != 0)
-            system("encore_utility set_bypass_charging 0");
     }
     return true;
 }

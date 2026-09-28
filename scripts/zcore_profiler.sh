@@ -954,6 +954,8 @@ performance_profile() {
 			chmod 444 "$QCOM_CHARGE_CURR" 2>/dev/null
 			chmod 644 "$QCOM_CHARGE_CTRL" 2>/dev/null
 		fi
+	else
+		restore_normal_charging
 	fi
 }
 
