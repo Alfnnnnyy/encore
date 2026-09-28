@@ -1,4 +1,4 @@
-## Zcore Tweaks 5.5.1
+## Zcore Tweaks 5.5.2
 
 **Thanks for using Zcore Tweaks!**
 
@@ -6,9 +6,6 @@ Your continued support keeps this project going.
 
 ### Changelog
 
-- Complete removal of pseudo bypass charging across backend scripts, daemon, and WebUI (eliminates battery drain and unstable PMIC states on single-buck converter hardware)
-- Responsive EAS scheduling: optimized sched_upmigrate and sched_initial_task_util to instantly promote game threads to Big and Prime cores
-- Snappy CPU governor rate limits: tuned schedutil up_rate_limit_us to 500us and down_rate_limit_us to 4000us for rapid frequency scaling without thermal lockup
-- Adreno GPU frame pacing guard: 80ms idle_timer prevents premature GPU downclocking across VSync intervals
-- Network packet latency fix: keep system-background CPUSet unthrottled and enable TCP timestamps with ECN negotiation to eliminate mobile gaming ping spikes
-- Extended sched_lib_name game engine registry: added Unreal Engine, Tencent TDataMaster, GCloud, and modern engine libraries
+- Pure Snappy EAS Governor: Removed rigid `performance` governor lock and `cpufreq_max_perf` in game mode, allowing CPU to operate natively under dynamic `schedutil` (0.5ms ramp-up on load spikes while resting during VSync intervals)
+- Adreno GPU Dynamic Scaling: Removed Level 0 hard lock (`min_pwrlevel=0`) and `force_clk_on=1` on Snapdragon, allowing GPU to clock gate and scale dynamically without burning 10W in 2D menus
+- Xiaomi / POCO Touch Game Mode: Activated `/sys/class/touch/touch_dev/game_mode` for maximum 480Hz polling rate and low-latency touch response
