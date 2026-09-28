@@ -49,12 +49,10 @@ get_bypass_status() {
 		echo "unsupported"
 		return 1
 	fi
-	if [ -f "$QCOM_CHARGE_CTRL" ]; then
-		val=$(cat "$QCOM_CHARGE_CTRL" 2>/dev/null)
-		if [ "$val" -eq 15 ] 2>/dev/null; then
-			echo "enabled"
-			return 0
-		fi
+	val=$(cat "$QCOM_CHARGE_CURR" 2>/dev/null)
+	if [ -n "$val" ] && [ "$val" -le 1500000 ]; then
+		echo "enabled"
+		return 0
 	fi
 	echo "disabled"
 	return 0
@@ -67,21 +65,20 @@ set_bypass_charging() {
 		return 1
 	fi
 
-	chmod 666 "$QCOM_CHARGE_CTRL" "$QCOM_CHARGE_CURR" "$QCOM_INPUT_SUSPEND" 2>/dev/null
+	chmod 666 "$QCOM_CHARGE_CTRL" "$QCOM_CHARGE_CURR" 2>/dev/null
 
 	if [ "$target" = "1" ] || [ "$target" = "enable" ] || [ "$target" = "on" ]; then
-		echo 15 > "$QCOM_CHARGE_CTRL" 2>/dev/null
-		echo 0 > "$QCOM_CHARGE_CURR" 2>/dev/null
-		echo 1 > "$QCOM_INPUT_SUSPEND" 2>/dev/null && sleep 0.1 && echo 0 > "$QCOM_INPUT_SUSPEND" 2>/dev/null
-		chmod 444 "$QCOM_CHARGE_CTRL" "$QCOM_CHARGE_CURR" 2>/dev/null
-		chmod 666 "$QCOM_INPUT_SUSPEND" 2>/dev/null
+		# Supply full unchoked input from adapter to the motherboard, float battery at 1.2A
+		echo 0 > "$QCOM_CHARGE_CTRL" 2>/dev/null
+		echo 1200000 > "$QCOM_CHARGE_CURR" 2>/dev/null
+		chmod 444 "$QCOM_CHARGE_CURR" 2>/dev/null
+		chmod 644 "$QCOM_CHARGE_CTRL" 2>/dev/null
 		echo "enabled"
 	else
+		# Restore full unthrottled fast charging
 		echo 0 > "$QCOM_CHARGE_CTRL" 2>/dev/null
-		echo 20000000 > "$QCOM_CHARGE_CURR" 2>/dev/null
-		echo 1 > "$QCOM_INPUT_SUSPEND" 2>/dev/null && sleep 0.1 && echo 0 > "$QCOM_INPUT_SUSPEND" 2>/dev/null
+		echo 4250000 > "$QCOM_CHARGE_CURR" 2>/dev/null
 		chmod 644 "$QCOM_CHARGE_CTRL" "$QCOM_CHARGE_CURR" 2>/dev/null
-		chmod 666 "$QCOM_INPUT_SUSPEND" 2>/dev/null
 		echo "disabled"
 	fi
 }

@@ -36,15 +36,10 @@ is_bypass_supported() {
 
 restore_normal_charging() {
 	if is_bypass_supported; then
-		val=$(cat "$QCOM_CHARGE_CTRL" 2>/dev/null)
-		if [ "$val" = "15" ]; then
-			chmod 666 "$QCOM_CHARGE_CTRL" "$QCOM_CHARGE_CURR" "$QCOM_INPUT_SUSPEND" 2>/dev/null
-			echo 0 > "$QCOM_CHARGE_CTRL" 2>/dev/null
-			echo 20000000 > "$QCOM_CHARGE_CURR" 2>/dev/null
-			echo 1 > "$QCOM_INPUT_SUSPEND" 2>/dev/null && sleep 0.1 && echo 0 > "$QCOM_INPUT_SUSPEND" 2>/dev/null
-			chmod 644 "$QCOM_CHARGE_CTRL" "$QCOM_CHARGE_CURR" 2>/dev/null
-			chmod 666 "$QCOM_INPUT_SUSPEND" 2>/dev/null
-		fi
+		chmod 666 "$QCOM_CHARGE_CTRL" "$QCOM_CHARGE_CURR" 2>/dev/null
+		echo 0 > "$QCOM_CHARGE_CTRL" 2>/dev/null
+		echo 4250000 > "$QCOM_CHARGE_CURR" 2>/dev/null
+		chmod 644 "$QCOM_CHARGE_CTRL" "$QCOM_CHARGE_CURR" 2>/dev/null
 	fi
 }
 
@@ -953,12 +948,11 @@ performance_profile() {
 	# Engage bypass charging if requested and supported
 	if [ -f "$MODULE_CONFIG/active_game_bypass" ]; then
 		if is_bypass_supported; then
-			chmod 666 "$QCOM_CHARGE_CTRL" "$QCOM_CHARGE_CURR" "$QCOM_INPUT_SUSPEND" 2>/dev/null
-			echo 15 > "$QCOM_CHARGE_CTRL" 2>/dev/null
-			echo 0 > "$QCOM_CHARGE_CURR" 2>/dev/null
-			echo 1 > "$QCOM_INPUT_SUSPEND" 2>/dev/null && sleep 0.1 && echo 0 > "$QCOM_INPUT_SUSPEND" 2>/dev/null
-			chmod 444 "$QCOM_CHARGE_CTRL" "$QCOM_CHARGE_CURR" 2>/dev/null
-			chmod 666 "$QCOM_INPUT_SUSPEND" 2>/dev/null
+			chmod 666 "$QCOM_CHARGE_CTRL" "$QCOM_CHARGE_CURR" 2>/dev/null
+			echo 0 > "$QCOM_CHARGE_CTRL" 2>/dev/null
+			echo 1200000 > "$QCOM_CHARGE_CURR" 2>/dev/null
+			chmod 444 "$QCOM_CHARGE_CURR" 2>/dev/null
+			chmod 644 "$QCOM_CHARGE_CTRL" 2>/dev/null
 		fi
 	fi
 }
