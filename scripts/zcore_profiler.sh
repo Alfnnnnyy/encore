@@ -374,19 +374,11 @@ snapdragon_performance() {
 
 	# GPU tweak
 	gpu_path="/sys/class/kgsl/kgsl-3d0/devfreq"
-	if [ "$LITE_MODE" -eq 0 ]; then
-		devfreq_max_perf "$gpu_path"
-		snapdragon_force_kgsl_pwrlevel 1
-	else
-		devfreq_unlock "$gpu_path"
-		snapdragon_force_kgsl_pwrlevel 0
-	fi
+	devfreq_unlock "$gpu_path"
+	snapdragon_force_kgsl_pwrlevel 0
 
 	# Disable GPU Bus split
 	apply 0 /sys/class/kgsl/kgsl-3d0/bus_split
-
-	# Force GPU clock on
-	apply 1 /sys/class/kgsl/kgsl-3d0/force_clk_on
 
 	# Adreno GPU frame pacing guard: 80ms timeout prevents premature VSync downclocking
 	[ -f /sys/class/kgsl/kgsl-3d0/idle_timer ] && apply 80 /sys/class/kgsl/kgsl-3d0/idle_timer
@@ -892,21 +884,12 @@ performance_profile() {
 	# Memory tweak
 	apply 80 /proc/sys/vm/vfs_cache_pressure
 
-	# Set CPU governor to performance.
-	# If lite mode enabled, use the default governor instead.
-	# device mitigation also will prevent performance gov to be
-	# applied (some device hates performance governor).
-	if [ $LITE_MODE -eq 0 ] && [ -z "$ENCORE_NO_PERFORMANCE_CPUGOV" ]; then
-		change_cpu_gov performance
-	else
-		change_cpu_gov "$DEFAULT_CPU_GOV"
-	fi
-
-	# Force CPU to highest possible frequency.
+	# Use responsive schedutil governor with sub-millisecond dynamic scaling
+	change_cpu_gov "$DEFAULT_CPU_GOV"
 	if [ -d /proc/ppm ]; then
-		cpufreq_ppm_max_perf
+		cpufreq_ppm_unlock
 	else
-		cpufreq_max_perf
+		cpufreq_unlock
 	fi
 
 	# I/O Tweaks
@@ -940,10 +923,10 @@ performance_profile() {
 		apply 25 /proc/sys/kernel/sched_initial_task_util
 	fi
 
-	# Snappy governor frequency ramp-up for zero input lag
+	# Snappy governor frequency ramp-up with frame-gap hold (prevents frequency yo-yo)
 	for pol in /sys/devices/system/cpu/cpufreq/policy*; do
 		[ -f "$pol/schedutil/up_rate_limit_us" ] && apply 500 "$pol/schedutil/up_rate_limit_us"
-		[ -f "$pol/schedutil/down_rate_limit_us" ] && apply 4000 "$pol/schedutil/down_rate_limit_us"
+		[ -f "$pol/schedutil/down_rate_limit_us" ] && apply 10000 "$pol/schedutil/down_rate_limit_us"
 	done
 }
 
@@ -961,10 +944,10 @@ balance_profile() {
 		apply 0 /proc/sys/kernel/sched_initial_task_util
 	fi
 
-	# Restore default governor rate limits
+	# Daily power-saving rate limits: filter micro-spikes and drop clocks immediately
 	for pol in /sys/devices/system/cpu/cpufreq/policy*; do
-		[ -f "$pol/schedutil/up_rate_limit_us" ] && apply 1000 "$pol/schedutil/up_rate_limit_us"
-		[ -f "$pol/schedutil/down_rate_limit_us" ] && apply 10000 "$pol/schedutil/down_rate_limit_us"
+		[ -f "$pol/schedutil/up_rate_limit_us" ] && apply 2000 "$pol/schedutil/up_rate_limit_us"
+		[ -f "$pol/schedutil/down_rate_limit_us" ] && apply 2000 "$pol/schedutil/down_rate_limit_us"
 	done
 
 	# Disable battery saver module
