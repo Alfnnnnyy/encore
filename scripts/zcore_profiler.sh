@@ -25,24 +25,6 @@
 MODULE_CONFIG="/data/adb/.config/zcore"
 [ ! -d "$MODULE_CONFIG" ] && [ -d "/data/adb/.config/encore" ] && MODULE_CONFIG="/data/adb/.config/encore"
 
-# Qualcomm PMIC Glink Bypass Charging nodes
-QCOM_CHARGE_CTRL="/sys/devices/platform/soc/soc:qcom,pmic_glink/soc:qcom,pmic_glink:qcom,battery_charger/power_supply/battery/charge_control_limit"
-QCOM_CHARGE_CURR="/sys/devices/platform/soc/soc:qcom,pmic_glink/soc:qcom,pmic_glink:qcom,battery_charger/power_supply/battery/constant_charge_current"
-QCOM_INPUT_SUSPEND="/sys/class/qcom-battery/input_suspend"
-
-is_bypass_supported() {
-	[ -f "$QCOM_CHARGE_CTRL" ] && [ -f "$QCOM_CHARGE_CURR" ] && [ -f "$QCOM_INPUT_SUSPEND" ]
-}
-
-restore_normal_charging() {
-	if is_bypass_supported; then
-		chmod 666 "$QCOM_CHARGE_CTRL" "$QCOM_CHARGE_CURR" 2>/dev/null
-		echo 0 > "$QCOM_CHARGE_CTRL" 2>/dev/null
-		echo 4250000 > "$QCOM_CHARGE_CURR" 2>/dev/null
-		chmod 644 "$QCOM_CHARGE_CTRL" "$QCOM_CHARGE_CURR" 2>/dev/null
-	fi
-}
-
 # Dynamic CPU topology detection for universal CPUSet isolation
 get_little_cpus() {
 	if [ -f /sys/devices/system/cpu/cpufreq/policy0/related_cpus ]; then
@@ -71,7 +53,6 @@ apply_game_cpuset() {
 
 	# Isolate background tasks to little cluster to keep big/prime cores pure for game
 	[ -n "$little" ] && apply "$little" /dev/cpuset/background/cpus
-	[ -n "$little" ] && apply "$little" /dev/cpuset/system-background/cpus
 	[ -n "$all" ] && apply "$all" /dev/cpuset/top-app/cpus
 }
 
@@ -81,7 +62,6 @@ restore_game_cpuset() {
 	all=$(get_all_cpus)
 
 	[ -n "$all" ] && apply "$all" /dev/cpuset/background/cpus
-	[ -n "$all" ] && apply "$all" /dev/cpuset/system-background/cpus
 }
 
 apply_uclamp_game() {
@@ -407,6 +387,9 @@ snapdragon_performance() {
 
 	# Force GPU clock on
 	apply 1 /sys/class/kgsl/kgsl-3d0/force_clk_on
+
+	# Adreno GPU frame pacing guard: 80ms timeout prevents premature VSync downclocking
+	[ -f /sys/class/kgsl/kgsl-3d0/idle_timer ] && apply 80 /sys/class/kgsl/kgsl-3d0/idle_timer
 }
 
 tegra_performance() {
@@ -600,6 +583,9 @@ snapdragon_normal() {
 
 	# Free GPU clock on/off
 	apply 0 /sys/class/kgsl/kgsl-3d0/force_clk_on
+
+	# Revert Adreno GPU idle timer to normal
+	[ -f /sys/class/kgsl/kgsl-3d0/idle_timer ] && apply 50 /sys/class/kgsl/kgsl-3d0/idle_timer
 }
 
 tegra_normal() {
@@ -793,10 +779,10 @@ perfcommon() {
 	done
 
 	apply 1 /proc/sys/net/ipv4/tcp_low_latency
-	apply 1 /proc/sys/net/ipv4/tcp_ecn
+	apply 2 /proc/sys/net/ipv4/tcp_ecn
 	apply 3 /proc/sys/net/ipv4/tcp_fastopen
 	apply 1 /proc/sys/net/ipv4/tcp_sack
-	apply 0 /proc/sys/net/ipv4/tcp_timestamps
+	apply 1 /proc/sys/net/ipv4/tcp_timestamps
 
 	# Limit max perf event processing time to this much CPU usage
 	apply 3 /proc/sys/kernel/perf_cpu_time_max_percent
@@ -852,7 +838,7 @@ perfcommon() {
 	apply 0 /proc/oplus_scheduler/sched_assist/sched_assist_enabled
 
 	# Report max CPU capabilities to these libraries
-	apply "libunity.so, libil2cpp.so, libmain.so, libUE4.so, libgodot_android.so, libgdx.so, libgdx-box2d.so, libminecraftpe.so, libLive2DCubismCore.so, libyuzu-android.so, libryujinx.so, libcitra-android.so, libhdr_pro_engine.so, libandroidx.graphics.path.so, libeffect.so" /proc/sys/kernel/sched_lib_name
+	apply "libunity.so, libil2cpp.so, libmain.so, libUE4.so, libUnreal.so, libgodot_android.so, libgdx.so, libminecraftpe.so, libgcloud.so, libTDataMaster.so, libeffect.so" /proc/sys/kernel/sched_lib_name
 	apply 255 /proc/sys/kernel/sched_lib_mask_force
 
 	# Set thermal governor to step_wise
@@ -945,27 +931,41 @@ performance_profile() {
 	apply_game_cpuset
 	apply_uclamp_game
 
-	# Engage bypass charging if requested and supported
-	if [ -f "$MODULE_CONFIG/active_game_bypass" ]; then
-		if is_bypass_supported; then
-			chmod 666 "$QCOM_CHARGE_CTRL" "$QCOM_CHARGE_CURR" 2>/dev/null
-			echo 0 > "$QCOM_CHARGE_CTRL" 2>/dev/null
-			echo 1200000 > "$QCOM_CHARGE_CURR" 2>/dev/null
-			chmod 444 "$QCOM_CHARGE_CURR" 2>/dev/null
-			chmod 644 "$QCOM_CHARGE_CTRL" 2>/dev/null
-		fi
-	else
-		restore_normal_charging
+	# Fast-track thread promotion to Big/Prime cores for games
+	if [ -f /proc/sys/kernel/sched_upmigrate ]; then
+		apply "60 70" /proc/sys/kernel/sched_upmigrate || apply 60 /proc/sys/kernel/sched_upmigrate
+		apply "45 55" /proc/sys/kernel/sched_downmigrate || apply 45 /proc/sys/kernel/sched_downmigrate
 	fi
+	if [ -f /proc/sys/kernel/sched_initial_task_util ]; then
+		apply 25 /proc/sys/kernel/sched_initial_task_util
+	fi
+
+	# Snappy governor frequency ramp-up for zero input lag
+	for pol in /sys/devices/system/cpu/cpufreq/policy*; do
+		[ -f "$pol/schedutil/up_rate_limit_us" ] && apply 500 "$pol/schedutil/up_rate_limit_us"
+		[ -f "$pol/schedutil/down_rate_limit_us" ] && apply 4000 "$pol/schedutil/down_rate_limit_us"
+	done
 }
 
 balance_profile() {
-	# Restore normal charging if bypass was active
-	restore_normal_charging
-
 	# Restore CPU core assignments and scheduler uclamp to balanced defaults
 	restore_game_cpuset
 	restore_uclamp_game
+
+	# Restore default EAS thread migration thresholds
+	if [ -f /proc/sys/kernel/sched_upmigrate ]; then
+		apply "85 95" /proc/sys/kernel/sched_upmigrate || apply 85 /proc/sys/kernel/sched_upmigrate
+		apply "65 75" /proc/sys/kernel/sched_downmigrate || apply 65 /proc/sys/kernel/sched_downmigrate
+	fi
+	if [ -f /proc/sys/kernel/sched_initial_task_util ]; then
+		apply 0 /proc/sys/kernel/sched_initial_task_util
+	fi
+
+	# Restore default governor rate limits
+	for pol in /sys/devices/system/cpu/cpufreq/policy*; do
+		[ -f "$pol/schedutil/up_rate_limit_us" ] && apply 1000 "$pol/schedutil/up_rate_limit_us"
+		[ -f "$pol/schedutil/down_rate_limit_us" ] && apply 10000 "$pol/schedutil/down_rate_limit_us"
+	done
 
 	# Disable battery saver module
 	[ -f /sys/module/battery_saver/parameters/enabled ] && {

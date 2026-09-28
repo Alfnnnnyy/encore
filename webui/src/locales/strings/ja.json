@@ -79,10 +79,7 @@
         "lite_mode": "ライトモード",
         "lite_mode_description": "ピークパフォーマンスよりもバッテリー寿命を延ばすために最適化",
         "dnd_mode": "集中モード",
-        "launch_app": "アプリを起動",
-        "bypass_charging": "バイパス充電",
-        "bypass_charging_description": "ゲーム中に直接電力を供給し、バッテリーの発熱を防ぎます",
-        "bypass_charging_unsupported": "ハードウェア非対応（Qualcomm PMIC Glink が必要です）"
+        "launch_app": "アプリを起動"
     },
     "language_selection": {
         "title": "言語",

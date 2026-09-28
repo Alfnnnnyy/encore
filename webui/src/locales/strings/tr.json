@@ -107,10 +107,7 @@
         "dnd_mode": "Rahatsız etme",
         "dnd_mode_description": "Oyundayken bildirimleri ve aramaları engelle",
         "launch_app": "Başlat",
-        "app_info": "Uygulama bilgileri",
-        "bypass_charging": "Bypass Şarjı",
-        "bypass_charging_description": "Pilin ısınmasını önlemek için oyun oynarken cihaza doğrudan güç sağlayın",
-        "bypass_charging_unsupported": "Donanım desteklenmiyor (Qualcomm PMIC Glink gerektirir)"
+        "app_info": "Uygulama bilgileri"
     },
     "language_selection": {
         "title": "Dil",

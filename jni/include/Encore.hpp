@@ -53,5 +53,4 @@ struct EncoreGameList {
     std::string package_name;
     bool lite_mode;
     bool enable_dnd;
-    bool enable_bypass_charging;
 };

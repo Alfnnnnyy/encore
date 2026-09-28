@@ -55,10 +55,7 @@
         "dnd_mode": "Просьба не беспокоить",
         "dnd_mode_description": "Блокировка уведомлений и звонков во время игры",
         "launch_app": "Запустить",
-        "app_info": "Информация о приложении",
-        "bypass_charging": "Обходная зарядка (Bypass)",
-        "bypass_charging_description": "Питание напрямую к плате во время игр для предотвращения нагрева аккумулятора",
-        "bypass_charging_unsupported": "Аппаратное обеспечение не поддерживается (требуется Qualcomm PMIC Glink)"
+        "app_info": "Информация о приложении"
     },
     "language_selection": {
         "title": "Язык",

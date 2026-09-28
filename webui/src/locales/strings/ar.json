@@ -87,10 +87,7 @@
         "dnd_mode": "عدم الإزعاج",
         "dnd_mode_description": "منع المكالمات و الإشعارات عند اللعب",
         "launch_app": "تشغيل",
-        "app_info": "معلومات التطبيق",
-        "bypass_charging": "الشحن المباشر (Bypass)",
-        "bypass_charging_description": "تزويد الجهاز بالطاقة مباشرة أثناء اللعب للحفاظ على برودة البطارية",
-        "bypass_charging_unsupported": "الجهاز غير مدعوم (يتطلب Qualcomm PMIC Glink)"
+        "app_info": "معلومات التطبيق"
     },
     "language_selection": {
         "title": "اللغة",

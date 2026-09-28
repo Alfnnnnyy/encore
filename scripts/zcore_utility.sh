@@ -30,59 +30,6 @@ change_cpu_gov() {
 	echo "$1" | tee /sys/devices/system/cpu/cpufreq/policy*/scaling_governor >/dev/null
 }
 
-# Qualcomm PMIC Glink Bypass Charging nodes
-QCOM_CHARGE_CTRL="/sys/devices/platform/soc/soc:qcom,pmic_glink/soc:qcom,pmic_glink:qcom,battery_charger/power_supply/battery/charge_control_limit"
-QCOM_CHARGE_CURR="/sys/devices/platform/soc/soc:qcom,pmic_glink/soc:qcom,pmic_glink:qcom,battery_charger/power_supply/battery/constant_charge_current"
-QCOM_INPUT_SUSPEND="/sys/class/qcom-battery/input_suspend"
-
-is_bypass_supported() {
-	if [ -f "$QCOM_CHARGE_CTRL" ] && [ -f "$QCOM_CHARGE_CURR" ] && [ -f "$QCOM_INPUT_SUSPEND" ]; then
-		echo "1"
-		return 0
-	fi
-	echo "0"
-	return 1
-}
-
-get_bypass_status() {
-	if ! is_bypass_supported >/dev/null 2>&1; then
-		echo "unsupported"
-		return 1
-	fi
-	val=$(cat "$QCOM_CHARGE_CURR" 2>/dev/null)
-	if [ -n "$val" ] && [ "$val" -le 1500000 ]; then
-		echo "enabled"
-		return 0
-	fi
-	echo "disabled"
-	return 0
-}
-
-set_bypass_charging() {
-	target="$1"
-	if ! is_bypass_supported >/dev/null 2>&1; then
-		echo "unsupported"
-		return 1
-	fi
-
-	chmod 666 "$QCOM_CHARGE_CTRL" "$QCOM_CHARGE_CURR" 2>/dev/null
-
-	if [ "$target" = "1" ] || [ "$target" = "enable" ] || [ "$target" = "on" ]; then
-		# Supply full unchoked input from adapter to the motherboard, float battery at 1.2A
-		echo 0 > "$QCOM_CHARGE_CTRL" 2>/dev/null
-		echo 1200000 > "$QCOM_CHARGE_CURR" 2>/dev/null
-		chmod 444 "$QCOM_CHARGE_CURR" 2>/dev/null
-		chmod 644 "$QCOM_CHARGE_CTRL" 2>/dev/null
-		echo "enabled"
-	else
-		# Restore full unthrottled fast charging
-		echo 0 > "$QCOM_CHARGE_CTRL" 2>/dev/null
-		echo 4250000 > "$QCOM_CHARGE_CURR" 2>/dev/null
-		chmod 644 "$QCOM_CHARGE_CTRL" "$QCOM_CHARGE_CURR" 2>/dev/null
-		echo "disabled"
-	fi
-}
-
 save_logs() {
 	report_dir="$MODULE_CONFIG/zcore_bugreport_temp"
 	mkdir -p "$report_dir/pstore"

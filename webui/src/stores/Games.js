@@ -8,22 +8,6 @@ export const useGamesStore = defineStore('games', () => {
   const searchQuery = ref('')
   const isLoading = ref(false)
   const gamelistConfig = ref({})
-  const isBypassSupported = ref(false)
-
-  async function checkBypassSupport() {
-    try {
-      const qcomNodes = [
-        '/sys/devices/platform/soc/soc:qcom,pmic_glink/soc:qcom,pmic_glink:qcom,battery_charger/power_supply/battery/charge_control_limit',
-        '/sys/devices/platform/soc/soc:qcom,pmic_glink/soc:qcom,pmic_glink:qcom,battery_charger/power_supply/battery/constant_charge_current',
-        '/sys/class/qcom-battery/input_suspend',
-      ]
-      const checks = await Promise.all(qcomNodes.map((p) => KernelSU.fileExists(p)))
-      isBypassSupported.value = checks.every(Boolean)
-    } catch {
-      isBypassSupported.value = false
-    }
-    return isBypassSupported.value
-  }
 
   const isAppEnabled = (packageName) => packageName in gamelistConfig.value
 
@@ -104,7 +88,6 @@ export const useGamesStore = defineStore('games', () => {
       currentConfig[packageName] = {
         lite_mode: !!config.lite_mode,
         enable_dnd: !!config.enable_dnd,
-        enable_bypass_charging: !!config.enable_bypass_charging,
       }
     } else {
       delete currentConfig[packageName]
@@ -129,7 +112,6 @@ export const useGamesStore = defineStore('games', () => {
       return await updateAppConfig(packageName, {
         lite_mode: currentConfig.lite_mode || false,
         enable_dnd: currentConfig.enable_dnd || false,
-        enable_bypass_charging: currentConfig.enable_bypass_charging || false,
       })
     } else {
       return await updateAppConfig(packageName, null)
@@ -268,7 +250,5 @@ export const useGamesStore = defineStore('games', () => {
     loadUserApps,
     initializeData,
     refreshFromSettings,
-    isBypassSupported,
-    checkBypassSupport,
   }
 })

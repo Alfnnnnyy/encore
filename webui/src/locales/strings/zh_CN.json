@@ -89,10 +89,7 @@
         "dnd_mode": "免打扰",
         "dnd_mode_description": "在游戏时阻止通知和电话",
         "launch_app": "启动",
-        "app_info": "应用信息",
-        "bypass_charging": "旁路充电 (Bypass Charging)",
-        "bypass_charging_description": "游戏时直接为设备供电，防止电池发热",
-        "bypass_charging_unsupported": "硬件不支持（需要高通 PMIC Glink 支持）"
+        "app_info": "应用信息"
     },
     "language_selection": {
         "title": "语言",
