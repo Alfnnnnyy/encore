@@ -374,11 +374,19 @@ snapdragon_performance() {
 
 	# GPU tweak
 	gpu_path="/sys/class/kgsl/kgsl-3d0/devfreq"
-	devfreq_unlock "$gpu_path"
-	snapdragon_force_kgsl_pwrlevel 0
+	if [ "$LITE_MODE" -eq 0 ]; then
+		devfreq_max_perf "$gpu_path"
+		snapdragon_force_kgsl_pwrlevel 1
+	else
+		devfreq_unlock "$gpu_path"
+		snapdragon_force_kgsl_pwrlevel 0
+	fi
 
 	# Disable GPU Bus split
 	apply 0 /sys/class/kgsl/kgsl-3d0/bus_split
+
+	# Force GPU clock on
+	apply 1 /sys/class/kgsl/kgsl-3d0/force_clk_on
 
 	# Adreno GPU frame pacing guard: 80ms timeout prevents premature VSync downclocking
 	[ -f /sys/class/kgsl/kgsl-3d0/idle_timer ] && apply 80 /sys/class/kgsl/kgsl-3d0/idle_timer
@@ -881,15 +889,25 @@ performance_profile() {
 		apply 1 $tp_path/oppo_tp_direction
 	fi
 
-	# Xiaomi / POCO Touch Game Mode
-	if [ -d /sys/class/touch/touch_dev ]; then
-		apply 1 /sys/class/touch/touch_dev/game_mode
-		apply 1 /sys/class/touch/touch_dev/touch_active
-	fi
-
 	# Memory tweak
 	apply 80 /proc/sys/vm/vfs_cache_pressure
-	change_cpu_gov "$DEFAULT_CPU_GOV"
+
+	# Set CPU governor to performance.
+	# If lite mode enabled, use the default governor instead.
+	# device mitigation also will prevent performance gov to be
+	# applied (some device hates performance governor).
+	if [ $LITE_MODE -eq 0 ] && [ -z "$ENCORE_NO_PERFORMANCE_CPUGOV" ]; then
+		change_cpu_gov performance
+	else
+		change_cpu_gov "$DEFAULT_CPU_GOV"
+	fi
+
+	# Force CPU to highest possible frequency.
+	if [ -d /proc/ppm ]; then
+		cpufreq_ppm_max_perf
+	else
+		cpufreq_max_perf
+	fi
 
 	# I/O Tweaks
 	for dir in /sys/block/mmcblk0 /sys/block/mmcblk1 /sys/block/sd*; do
@@ -985,12 +1003,6 @@ balance_profile() {
 		apply 1 $tp_path/oppo_tp_limit_enable
 		apply 0 $tp_path/oplus_tp_direction
 		apply 0 $tp_path/oppo_tp_direction
-	fi
-
-	# Restore Xiaomi / POCO Touch Game Mode
-	if [ -d /sys/class/touch/touch_dev ]; then
-		apply 0 /sys/class/touch/touch_dev/game_mode
-		apply 0 /sys/class/touch/touch_dev/touch_active
 	fi
 
 	# Memory Tweaks
