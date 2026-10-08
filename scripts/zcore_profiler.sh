@@ -70,7 +70,7 @@ restore_game_cpuset() {
 
 apply_uclamp_game() {
 	apply 1 /dev/cpuctl/top-app/cpu.uclamp.latency_sensitive
-	apply 20 /dev/cpuctl/top-app/cpu.uclamp.min
+	apply 250 /dev/cpuctl/top-app/cpu.uclamp.min 2>/dev/null || apply 25 /dev/cpuctl/top-app/cpu.uclamp.min
 }
 
 restore_uclamp_game() {
@@ -272,8 +272,12 @@ snapdragon_force_kgsl_pwrlevel() {
 		cat /sys/class/kgsl/kgsl-3d0/num_pwrlevels >/sys/class/kgsl/kgsl-3d0/min_pwrlevel
 		echo 0 >/sys/class/kgsl/kgsl-3d0/max_pwrlevel
 		;;
-	1) # Performance
-		echo 0 >/sys/class/kgsl/kgsl-3d0/min_pwrlevel
+	1) # Performance with 120 FPS floor (prevents downclocking to 200MHz)
+		local num_levels
+		num_levels=$(cat /sys/class/kgsl/kgsl-3d0/num_pwrlevels 2>/dev/null || echo 6)
+		local floor_level=$((num_levels > 3 ? num_levels - 3 : 2))
+		[ "$floor_level" -lt 1 ] && floor_level=1
+		echo "$floor_level" >/sys/class/kgsl/kgsl-3d0/min_pwrlevel
 		echo 0 >/sys/class/kgsl/kgsl-3d0/max_pwrlevel
 		;;
 	esac
@@ -358,28 +362,19 @@ snapdragon_performance() {
 		for path in /sys/class/devfreq/*memlat* \
 			/sys/class/devfreq/*latfloor* \
 			/sys/class/devfreq/*ddr-lat*; do
-
-			if [ $LITE_MODE -eq 0 ]; then
-				devfreq_max_perf "$path"
-			else
-				devfreq_mid_perf "$path"
-			fi
+			devfreq_mid_perf "$path"
 		done
 
 		for component in DDR LLCC L3; do
 			path="/sys/devices/system/cpu/bus_dcvs/$component"
-			if [ "$LITE_MODE" -eq 0 ]; then
-				qcom_cpudcvs_max_perf "$path"
-			else
-				qcom_cpudcvs_mid_perf "$path"
-			fi
+			qcom_cpudcvs_mid_perf "$path"
 		done
 	}
 
 	# GPU tweak
 	gpu_path="/sys/class/kgsl/kgsl-3d0/devfreq"
 	devfreq_unlock "$gpu_path"
-	snapdragon_force_kgsl_pwrlevel 0
+	snapdragon_force_kgsl_pwrlevel 1
 
 	# Disable GPU Bus split
 	apply 0 /sys/class/kgsl/kgsl-3d0/bus_split
@@ -836,11 +831,6 @@ perfcommon() {
 	# Report max CPU capabilities to these libraries
 	apply "libunity.so, libil2cpp.so, libmain.so, libUE4.so, libUnreal.so, libgodot_android.so, libgdx.so, libminecraftpe.so, libgcloud.so, libTDataMaster.so, libeffect.so" /proc/sys/kernel/sched_lib_name
 	apply 255 /proc/sys/kernel/sched_lib_mask_force
-
-	# Set thermal governor to step_wise
-	for dir in /sys/class/thermal/thermal_zone*; do
-		apply "step_wise" "$dir/policy"
-	done
 }
 
 performance_profile() {
@@ -888,13 +878,15 @@ performance_profile() {
 	# Memory tweak
 	apply 80 /proc/sys/vm/vfs_cache_pressure
 
-	# Use responsive schedutil governor with sub-millisecond dynamic scaling
+	# Use responsive schedutil governor with mid-frequency floor for sustained 120 FPS
 	change_cpu_gov "$DEFAULT_CPU_GOV"
-	if [ -d /proc/ppm ]; then
-		cpufreq_ppm_unlock
-	else
-		cpufreq_unlock
-	fi
+	for path in /sys/devices/system/cpu/*/cpufreq; do
+		cpu_maxfreq=$(<"$path/cpuinfo_max_freq")
+		cpu_midfreq=$(which_midfreq "$path/scaling_available_frequencies")
+		write "$cpu_maxfreq" "$path/scaling_max_freq"
+		write "$cpu_midfreq" "$path/scaling_min_freq"
+	done
+	chmod -f 644 /sys/devices/system/cpu/cpufreq/policy*/scaling_*_freq
 
 	# I/O Tweaks
 	for dir in /sys/block/mmcblk0 /sys/block/mmcblk1 /sys/block/sd*; do
@@ -930,7 +922,7 @@ performance_profile() {
 	# Snappy governor frequency ramp-up with frame-gap hold (prevents frequency yo-yo)
 	for pol in /sys/devices/system/cpu/cpufreq/policy*; do
 		[ -f "$pol/schedutil/up_rate_limit_us" ] && apply 500 "$pol/schedutil/up_rate_limit_us"
-		[ -f "$pol/schedutil/down_rate_limit_us" ] && apply 10000 "$pol/schedutil/down_rate_limit_us"
+		[ -f "$pol/schedutil/down_rate_limit_us" ] && apply 20000 "$pol/schedutil/down_rate_limit_us"
 	done
 }
 
