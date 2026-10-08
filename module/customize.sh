@@ -229,6 +229,7 @@ unzip -o "$ZIPFILE" "webroot/*" -d "$MODPATH" -x "*.sha256" >&2
 [ -d /data/encore ] && rm -rf /data/encore
 [ -d /data/zcore ] && rm -rf /data/zcore
 [ -f /data/local/tmp/encore_logo.png ] && rm -f /data/local/tmp/encore_logo.png
+rm -rf /data/adb/modules/encore 2>/dev/null || true
 
 # Set configs
 ui_print "- Zcore Tweaks configuration setup"
@@ -250,7 +251,6 @@ set_perm "$MODPATH/post-fs-data.sh" 0 0 0755 2>/dev/null
 make_dir "$MODULE_CONFIG"
 make_dir "/data/adb/.config/zcore"
 [ ! -L "/data/adb/.config/zcore" ] && ln -sf "/data/adb/.config/encore" "/data/adb/.config/zcore" 2>/dev/null || true
-[ ! -L "/data/adb/modules/encore" ] && ln -sf "$MODPATH" "/data/adb/modules/encore" 2>/dev/null || true
 
 # Gamelist setup
 need_generate=0

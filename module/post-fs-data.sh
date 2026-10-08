@@ -17,6 +17,7 @@
 
 MODDIR=${0%/*}
 MODULE_CONFIG="/data/adb/.config/zcore"
+rm -rf /data/adb/modules/encore 2>/dev/null || true
 
 # === SUSFS Kernel Cloaking (Additive & Anti-Detection) ===
 SUSFS_BIN=""

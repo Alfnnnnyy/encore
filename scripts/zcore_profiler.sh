@@ -58,10 +58,14 @@ apply_game_cpuset() {
 
 restore_game_cpuset() {
 	[ ! -d "/dev/cpuset" ] && return 0
+	local little
+	little=$(get_little_cpus)
 	local all
 	all=$(get_all_cpus)
 
-	[ -n "$all" ] && apply "$all" /dev/cpuset/background/cpus
+	# Keep background tasks strictly on Little cores so Prime/Big cores remain in deep sleep
+	[ -n "$little" ] && apply "$little" /dev/cpuset/background/cpus
+	[ -n "$all" ] && apply "$all" /dev/cpuset/top-app/cpus
 }
 
 apply_uclamp_game() {
@@ -788,14 +792,14 @@ perfcommon() {
 	# Disable Sched auto group
 	apply 0 /proc/sys/kernel/sched_autogroup_enabled
 
-	# Enable CRF
-	apply 1 /proc/sys/kernel/sched_child_runs_first
+	# Default CRF (do not force child first on fork)
+	apply 0 /proc/sys/kernel/sched_child_runs_first
 
-	# Improve real time latencies by reducing the scheduler migration time
-	apply 32 /proc/sys/kernel/sched_nr_migrate
+	# Standard Linux task migration scan depth
+	apply 8 /proc/sys/kernel/sched_nr_migrate
 
-	# Tweaking scheduler to reduce latency
-	apply 50000 /proc/sys/kernel/sched_migration_cost_ns
+	# Prevent task bouncing between CPU clusters during idle
+	apply 500000 /proc/sys/kernel/sched_migration_cost_ns
 	apply 1000000 /proc/sys/kernel/sched_min_granularity_ns
 	apply 1500000 /proc/sys/kernel/sched_wakeup_granularity_ns
 
@@ -946,7 +950,7 @@ balance_profile() {
 
 	# Daily power-saving rate limits: filter micro-spikes and drop clocks immediately
 	for pol in /sys/devices/system/cpu/cpufreq/policy*; do
-		[ -f "$pol/schedutil/up_rate_limit_us" ] && apply 2000 "$pol/schedutil/up_rate_limit_us"
+		[ -f "$pol/schedutil/up_rate_limit_us" ] && apply 1000 "$pol/schedutil/up_rate_limit_us"
 		[ -f "$pol/schedutil/down_rate_limit_us" ] && apply 2000 "$pol/schedutil/down_rate_limit_us"
 	done
 

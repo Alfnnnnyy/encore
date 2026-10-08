@@ -15,9 +15,13 @@
 #
 
 rm -rf /data/adb/.config/encore
+rm -rf /data/adb/.config/zcore
 rm -f /data/adb/service.d/.encore_cleanup.sh
+rm -f /data/adb/service.d/.zcore_cleanup.sh
+rm -rf /data/adb/modules/encore
+rm -rf /data/adb/modules/zcore
 
-need_gone="encored encore_profiler encore_utility encore_log"
+need_gone="zcored zcore_profiler zcore_utility encored encore_profiler encore_utility encore_log"
 manager_paths="/data/adb/ap/bin /data/adb/ksu/bin"
 
 for dir in $manager_paths; do

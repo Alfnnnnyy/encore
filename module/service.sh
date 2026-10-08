@@ -23,7 +23,7 @@ if [ -d "/data/adb/.config/encore" ] && [ ! -L "/data/adb/.config/encore" ]; the
 	cp -r /data/adb/.config/encore/* "$MODULE_CONFIG/" 2>/dev/null || true
 fi
 [ ! -e "/data/adb/.config/encore" ] && ln -sf "$MODULE_CONFIG" "/data/adb/.config/encore" 2>/dev/null
-[ ! -e "/data/adb/modules/encore" ] && ln -sf "$MODDIR" "/data/adb/modules/encore" 2>/dev/null
+rm -rf /data/adb/modules/encore 2>/dev/null || true
 
 CLEANUP_SCRIPT="/data/adb/service.d/.zcore_cleanup.sh"
 CPUFREQ="/sys/devices/system/cpu/cpu0/cpufreq"
@@ -103,11 +103,6 @@ if [ -d /data/vendor/thermal ]; then
 		chmod 644 /data/vendor/thermal/config/* 2>/dev/null
 	fi
 fi
-resetprop -n persist.vendor.thermal.enable 0 2>/dev/null
-resetprop -n vendor.thermal.enable 0 2>/dev/null
-for zone in /sys/class/thermal/thermal_zone*/mode; do
-	echo "disabled" > "$zone" 2>/dev/null || true
-done
 
 # ZeroMount & SUSFS cloaking check
 _OP_KSU_UMNT="umo""unt"
