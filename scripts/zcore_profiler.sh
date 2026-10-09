@@ -775,6 +775,11 @@ perfcommon() {
 	apply 1 /proc/sys/net/ipv4/tcp_sack
 	apply 1 /proc/sys/net/ipv4/tcp_timestamps
 
+	# Socket buffer & backlog headroom for sudden burst packets (extraction shooter gunfights)
+	apply 5000 /proc/sys/net/core/netdev_max_backlog
+	apply 8388608 /proc/sys/net/core/rmem_max
+	apply 8388608 /proc/sys/net/core/wmem_max
+
 	# Limit max perf event processing time to this much CPU usage
 	apply 3 /proc/sys/kernel/perf_cpu_time_max_percent
 
@@ -814,6 +819,9 @@ perfcommon() {
 	# Prevent kswapd memory reclaim thrashing during gaming asset loads
 	apply 0 /proc/sys/vm/watermark_boost_factor
 
+	# Preempt direct reclaim stalls on sudden actor/texture allocations (AOSP cushion)
+	apply 150 /proc/sys/vm/watermark_scale_factor
+
 	restore_game_cpuset
 	restore_uclamp_game
 
@@ -829,7 +837,7 @@ perfcommon() {
 	apply 0 /proc/oplus_scheduler/sched_assist/sched_assist_enabled
 
 	# Report max CPU capabilities to these libraries
-	apply "libunity.so, libil2cpp.so, libmain.so, libUE4.so, libUnreal.so, libgodot_android.so, libgdx.so, libminecraftpe.so, libgcloud.so, libTDataMaster.so, libeffect.so" /proc/sys/kernel/sched_lib_name
+	apply "libunity.so, libil2cpp.so, libmain.so, libUE4.so, libUnreal.so, libgodot_android.so, libgdx.so, libminecraftpe.so, libgcloud.so, libTDataMaster.so, libeffect.so, libAkSoundEngine.so, libINTLFoundation.so" /proc/sys/kernel/sched_lib_name
 	apply 255 /proc/sys/kernel/sched_lib_mask_force
 }
 
@@ -894,8 +902,12 @@ performance_profile() {
 		apply 32 "$dir/queue/read_ahead_kb"
 
 		# Reduce the maximum number of I/O requests in exchange for latency
-		apply 32 "$dir/queue/nr_requests"
+		apply 128 "$dir/queue/nr_requests"
 	done &
+
+	# Tighten scheduler preemption latency for sub-8.3ms VSync deadlines
+	apply 500000 /proc/sys/kernel/sched_min_granularity_ns
+	apply 500000 /proc/sys/kernel/sched_wakeup_granularity_ns
 
 	case $SOC in
 	1) mediatek_performance ;;
@@ -957,6 +969,10 @@ balance_profile() {
 
 	# Enable split lock mitigation
 	apply 1 /proc/sys/kernel/split_lock_mitigate
+
+	# Restore balanced scheduler preemption latency
+	apply 1000000 /proc/sys/kernel/sched_min_granularity_ns
+	apply 1500000 /proc/sys/kernel/sched_wakeup_granularity_ns
 
 	if [ -f "/sys/kernel/debug/sched_features" ]; then
 		# Consider scheduling tasks that are eager to run
