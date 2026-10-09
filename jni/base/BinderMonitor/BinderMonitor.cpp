@@ -28,6 +28,8 @@
 #include <thread>
 #include <atomic>
 #include <chrono>
+#include <condition_variable>
+#include <mutex>
 
 // =============================================================================
 // Transaction Codes Enum & Resolver Metadata
@@ -93,6 +95,8 @@ struct BinderMonitorState {
 
     std::thread powerSavePollThread;
     std::atomic<bool> stopPowerSavePolling{false};
+    std::mutex powerSaveMutex;
+    std::condition_variable powerSaveCv;
 
     uint32_t getCode(TxCode code) const {
         auto it = txCodes.find(code);
@@ -367,14 +371,27 @@ displayCallback_transact(AIBinder *, uint32_t code, const AParcel *, AParcel *) 
     if (code != gState.getCode(TxCode::OnDisplayEvent)) return STATUS_UNKNOWN_ERROR;
     bool current = queryIsInteractive();
     if (current != gState.displayLastState) {
-        gState.displayLastState = current;
+        {
+            std::lock_guard<std::mutex> lock(gState.powerSaveMutex);
+            gState.displayLastState = current;
+        }
+        gState.powerSaveCv.notify_all();
         if (gState.displayCallback) gState.displayCallback(current);
     }
     return STATUS_OK;
 }
 
 static void pollPowerSave() {
-    while (!gState.stopPowerSavePolling) {
+    while (!gState.stopPowerSavePolling.load()) {
+        std::unique_lock<std::mutex> lock(gState.powerSaveMutex);
+
+        // While screen is OFF, wait indefinitely (zero wakeups, zero binder calls)
+        gState.powerSaveCv.wait(lock, [] {
+            return gState.stopPowerSavePolling.load() || gState.displayLastState;
+        });
+
+        if (gState.stopPowerSavePolling.load()) break;
+
         bool current = transactReadInt32(gState.powerBinder, gState.getCode(TxCode::IsPowerSaveMode), "android.os.IPowerManager", 0) != 0;
         if (current != gState.powerSaveLastState) {
             gState.powerSaveLastState = current;
@@ -382,7 +399,11 @@ static void pollPowerSave() {
                 gState.powerSaveCallback(current);
             }
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+        // Wait 5 seconds while screen is ON (wakes up immediately if screen turns OFF or stopping)
+        gState.powerSaveCv.wait_for(lock, std::chrono::seconds(5), [] {
+            return gState.stopPowerSavePolling.load() || !gState.displayLastState;
+        });
     }
 }
 
@@ -397,6 +418,7 @@ BinderMonitor &BinderMonitor::get() {
 
 BinderMonitor::~BinderMonitor() {
     gState.stopPowerSavePolling = true;
+    gState.powerSaveCv.notify_all();
     if (gState.powerSavePollThread.joinable()) {
         gState.powerSavePollThread.join();
     }
