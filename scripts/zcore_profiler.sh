@@ -65,6 +65,7 @@ restore_game_cpuset() {
 
 	# Keep background tasks strictly on Little cores so Prime/Big cores remain in deep sleep
 	[ -n "$little" ] && apply "$little" /dev/cpuset/background/cpus
+	[ -n "$little" ] && apply "$little" /dev/cpuset/system-background/cpus
 	[ -n "$all" ] && apply "$all" /dev/cpuset/top-app/cpus
 }
 
@@ -567,7 +568,8 @@ snapdragon_normal() {
 
 	# Revert GPU tweak
 	devfreq_unlock /sys/class/kgsl/kgsl-3d0/devfreq
-	snapdragon_force_kgsl_pwrlevel 0
+	echo 3 >/sys/class/kgsl/kgsl-3d0/max_pwrlevel 2>/dev/null || echo 2 >/sys/class/kgsl/kgsl-3d0/max_pwrlevel 2>/dev/null
+	cat /sys/class/kgsl/kgsl-3d0/num_pwrlevels >/sys/class/kgsl/kgsl-3d0/min_pwrlevel 2>/dev/null
 
 	# Enable back GPU Bus split
 	apply 1 /sys/class/kgsl/kgsl-3d0/bus_split
@@ -954,7 +956,7 @@ balance_profile() {
 
 	# Daily power-saving rate limits: filter micro-spikes and drop clocks immediately
 	for pol in /sys/devices/system/cpu/cpufreq/policy*; do
-		[ -f "$pol/schedutil/up_rate_limit_us" ] && apply 1000 "$pol/schedutil/up_rate_limit_us"
+		[ -f "$pol/schedutil/up_rate_limit_us" ] && apply 2500 "$pol/schedutil/up_rate_limit_us"
 		[ -f "$pol/schedutil/down_rate_limit_us" ] && apply 2000 "$pol/schedutil/down_rate_limit_us"
 	done
 
@@ -1009,7 +1011,32 @@ balance_profile() {
 	if [ -d /proc/ppm ]; then
 		cpufreq_ppm_unlock
 	else
-		cpufreq_unlock
+		# Cool daily ceiling: A520 full max, A720 ~1.6GHz, X4 ~1.4GHz
+		for pol in /sys/devices/system/cpu/cpufreq/policy*; do
+			min_f=$(<"$pol/cpuinfo_min_freq")
+			case "$pol" in
+			*/policy0)
+				# Little Core: unconstrained max
+				max_f=$(<"$pol/cpuinfo_max_freq")
+				;;
+			*/policy7)
+				# Prime Core (X4): lower-mid cap (~1.2-1.4 GHz) to eliminate 4W thermal dump
+				total_opp=$(wc -w <"$pol/scaling_available_frequencies" 2>/dev/null || echo 0)
+				target_opp=$(((total_opp * 2) / 3))
+				max_f=$(tr ' ' '\n' <"$pol/scaling_available_frequencies" 2>/dev/null | sort -nr | head -n $target_opp | tail -n 1)
+				[ -z "$max_f" ] && max_f=$(which_midfreq "$pol/scaling_available_frequencies")
+				[ -z "$max_f" ] && max_f=$(<"$pol/cpuinfo_max_freq")
+				;;
+			*)
+				# Big Cores (A720): mid-frequency cap (~1.6-1.8 GHz) for cool 120Hz UI
+				max_f=$(which_midfreq "$pol/scaling_available_frequencies")
+				[ -z "$max_f" ] && max_f=$(<"$pol/cpuinfo_max_freq")
+				;;
+			esac
+			write "$max_f" "$pol/scaling_max_freq"
+			write "$min_f" "$pol/scaling_min_freq"
+		done
+		chmod -f 644 /sys/devices/system/cpu/cpufreq/policy*/scaling_*_freq
 	fi
 
 	# I/O Tweaks
